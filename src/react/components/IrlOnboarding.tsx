@@ -21,8 +21,13 @@ export function IrlOnboarding({
   const [selectedMode, setSelectedMode] = useState<'download' | 'create' | null>(
     mode === 'choice' ? null : 'download'
   )
+  const [name, setName] = useState('')
+  const [nameError, setNameError] = useState<string | null>(null)
 
   const { pressedElement, handlePressStart, handlePressEnd } = usePressState()
+
+  // Validate name (2-50 chars)
+  const isNameValid = (n: string) => n.trim().length >= 2 && n.trim().length <= 50
 
   const {
     primaryColor = '#403B51',
@@ -128,31 +133,114 @@ export function IrlOnboarding({
         fontSize: '14px',
         textTransform: 'uppercase' as const,
         letterSpacing: '0.5px'
+      },
+      inputGroup: {
+        display: 'flex',
+        flexDirection: 'column' as const,
+        gap: '8px',
+        marginBottom: '16px',
+        textAlign: 'left' as const
+      },
+      label: {
+        fontSize: '14px',
+        fontWeight: '500',
+        paddingLeft: '4px',
+        opacity: 0.8
+      },
+      input: {
+        width: '100%',
+        padding: '16px',
+        fontSize: '16px',
+        border: `2px solid ${nameError ? '#ff3b30' : 'rgba(0, 0, 0, 0.1)'}`,
+        borderRadius: customStyles.inputRadius || '8px',
+        outline: 'none',
+        transition: 'border-color 0.2s',
+        fontFamily,
+        boxSizing: 'border-box' as const,
+        WebkitTapHighlightColor: mobileTapHighlightColor
+      },
+      errorText: {
+        fontSize: '12px',
+        color: '#ff3b30',
+        marginTop: '4px',
+        paddingLeft: '4px'
+      },
+      secondaryText: {
+        fontSize: '16px',
+        opacity: 0.7,
+        marginBottom: '16px'
       }
+    }
+
+    const handleNextClick = () => {
+      const trimmedName = name.trim()
+      if (!trimmedName) {
+        setNameError('Please enter your name')
+        return
+      }
+      if (trimmedName.length < 2) {
+        setNameError('Name must be at least 2 characters')
+        return
+      }
+      if (trimmedName.length > 50) {
+        setNameError('Name must be less than 50 characters')
+        return
+      }
+      setNameError(null)
+      setSelectedMode('create')
     }
 
     return (
       <div style={styles.container}>
         <div style={styles.content}>
-          <div style={styles.iconContainer}>
-            <img
-              src="https://ax0.taddy.org/antler/antler-icon.webp"
-              alt="Antler"
-              style={styles.icon}
+
+          {/* Primary: Create Account */}
+          <h1 style={styles.title}>What's your name?</h1>
+
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>Name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value)
+                if (nameError) setNameError(null)
+              }}
+              placeholder="Enter your name"
+              style={styles.input}
+              maxLength={50}
+              autoComplete="name"
+              inputMode="text"
             />
+            {nameError && <div style={styles.errorText}>{nameError}</div>}
           </div>
 
-          {/* <h1 style={styles.title}>Sign Up to Get Started</h1> */}
-          <p style={styles.subtitle}>Sign in instantly using the Antler app</p>
-
           <div style={styles.buttonsContainer}>
-            {/* App Store Download Badges */}
-            <DownloadBadges
-              pressedElement={pressedElement}
-              onPressStart={handlePressStart}
-              onPressEnd={handlePressEnd}
-              customStyles={{ mobileButtonPressScale, mobileTapHighlightColor }}
-            />
+            <button
+              onClick={handleNextClick}
+              style={{
+                ...styles.buttonPrimary,
+                transform: pressedElement === 'next-button' ? `scale(${mobileButtonPressScale})` : 'scale(1)',
+                opacity: !name.trim() ? 0.5 : pressedElement === 'next-button' ? 0.9 : 1
+              }}
+              onTouchStart={() => handlePressStart('next-button')}
+              onTouchEnd={handlePressEnd}
+              onTouchCancel={handlePressEnd}
+              onMouseEnter={(e) => {
+                if (!pressedElement && name.trim()) {
+                  ;(e.currentTarget as HTMLElement).style.opacity = '0.9'
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!pressedElement) {
+                  ;(e.currentTarget as HTMLElement).style.opacity = !name.trim() ? '0.5' : '1'
+                  ;(e.currentTarget as HTMLElement).style.transform = 'scale(1)'
+                }
+              }}
+              disabled={!name.trim()}
+            >
+              Next
+            </button>
 
             <div style={styles.divider}>
               <div style={styles.dividerLine} />
@@ -160,30 +248,15 @@ export function IrlOnboarding({
               <div style={styles.dividerLine} />
             </div>
 
-            <button
-              onClick={() => setSelectedMode('create')}
-              style={{
-                ...styles.buttonSecondary,
-                transform: pressedElement === 'create-button' ? `scale(${mobileButtonPressScale})` : 'scale(1)',
-                opacity: pressedElement === 'create-button' ? 0.9 : 1
-              }}
-              onTouchStart={() => handlePressStart('create-button')}
-              onTouchEnd={handlePressEnd}
-              onTouchCancel={handlePressEnd}
-              onMouseEnter={(e) => {
-                if (!pressedElement) {
-                  ;(e.currentTarget as HTMLElement).style.opacity = '0.9'
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!pressedElement) {
-                  ;(e.currentTarget as HTMLElement).style.opacity = '1'
-                  ;(e.currentTarget as HTMLElement).style.transform = 'scale(1)'
-                }
-              }}
-            >
-              Create Temporary Account
-            </button>
+            {/* Secondary: Use Antler */}
+            <p style={styles.secondaryText}>Sign in instantly with Antler</p>
+
+            <DownloadBadges
+              pressedElement={pressedElement}
+              onPressStart={handlePressStart}
+              onPressEnd={handlePressEnd}
+              customStyles={{ mobileButtonPressScale, mobileTapHighlightColor }}
+            />
           </div>
         </div>
       </div>
@@ -203,6 +276,7 @@ export function IrlOnboarding({
 
     return (
       <CreateAccountFlow
+        initialName={name.trim()}
         skipSocialStep={skipSocialStep}
         skipAvatarStep={skipAvatarStep}
         onComplete={onComplete}

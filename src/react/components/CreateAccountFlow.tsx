@@ -11,19 +11,34 @@ import { AvatarStep } from './AvatarStep'
 import { createProfile } from '../../core/profile'
 
 export function CreateAccountFlow({
+  initialName,
   skipSocialStep = false,
   skipAvatarStep = false,
   onComplete,
   onBack,
   customStyles = {}
 }: CreateAccountFlowProps) {
-  const [step, setStep] = useState<'name' | 'socials' | 'avatar'>('name')
-  const [name, setName] = useState('')
+  // Check if we have a valid initial name (2-50 chars)
+  const hasValidInitialName = !!(initialName && initialName.trim().length >= 2 && initialName.trim().length <= 50)
+
+  // Determine starting step based on whether name is pre-provided
+  const getInitialStep = (): 'name' | 'socials' | 'avatar' => {
+    if (!hasValidInitialName) return 'name'
+    if (!skipSocialStep) return 'socials'
+    if (!skipAvatarStep) return 'avatar'
+    return 'name' // fallback
+  }
+
+  const [step, setStep] = useState<'name' | 'socials' | 'avatar'>(getInitialStep())
+  const [name, setName] = useState(hasValidInitialName ? initialName!.trim() : '')
   const [socials, setSocials] = useState<SocialLink[]>([])
   const [isCreating, setIsCreating] = useState(false)
 
   // Calculate total steps based on skip parameters
-  const totalSteps = 3 - (skipSocialStep ? 1 : 0) - (skipAvatarStep ? 1 : 0)
+  const totalSteps = 3
+    - (hasValidInitialName ? 1 : 0) // skip name step if pre-provided
+    - (skipSocialStep ? 1 : 0)
+    - (skipAvatarStep ? 1 : 0)
 
   const handleNameNext = (enteredName: string) => {
     setName(enteredName)
@@ -59,12 +74,22 @@ export function CreateAccountFlow({
   }
 
   const handleSocialsBack = () => {
-    setStep('name')
+    // If name was pre-provided, go back to the combined screen
+    if (hasValidInitialName && onBack) {
+      onBack()
+    } else {
+      setStep('name')
+    }
   }
 
   const handleAvatarBack = () => {
     if (skipSocialStep) {
-      setStep('name')
+      // If socials is skipped and name was pre-provided, go back to combined screen
+      if (hasValidInitialName && onBack) {
+        onBack()
+      } else {
+        setStep('name')
+      }
     } else {
       setStep('socials')
     }
@@ -149,7 +174,7 @@ export function CreateAccountFlow({
           name={name}
           onNext={handleSocialsNext}
           onBack={handleSocialsBack}
-          currentStep={2}
+          currentStep={hasValidInitialName ? 1 : 2}
           totalSteps={totalSteps}
           initialValue={socials}
           customStyles={customStyles}
@@ -157,13 +182,16 @@ export function CreateAccountFlow({
       )
 
     case 'avatar':
+      // Calculate current step for avatar
+      // Start from 1, add 1 if name step shown, add 1 if socials step shown
+      const avatarStep = 1 + (hasValidInitialName ? 0 : 1) + (skipSocialStep ? 0 : 1)
       return (
         <AvatarStep
           name={name}
           socials={socials}
           onComplete={(avatar) => handleComplete(name, socials, avatar)}
           onBack={handleAvatarBack}
-          currentStep={skipSocialStep ? 2 : 3}
+          currentStep={avatarStep}
           totalSteps={totalSteps}
           customStyles={customStyles}
         />

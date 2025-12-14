@@ -39,7 +39,7 @@ function App() {
   if (showOnboarding) {
     return (
       <IrlOnboarding
-        mode="choice" // Shows both: download OR create account
+        mode="choice" // Shows both download and create account options
         onComplete={(profile) => {
           console.log('Profile created:', profile)
           setShowOnboarding(false)

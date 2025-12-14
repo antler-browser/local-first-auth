@@ -202,6 +202,7 @@ export interface DownloadPromptProps {
 }
 
 export interface CreateAccountFlowProps {
+  initialName?: string
   skipSocialStep?: boolean
   skipAvatarStep?: boolean
   onComplete?: (profile: Profile) => void
