@@ -1,7 +1,7 @@
 {
   "name": "local-first-auth",
   "version": "1.0.0",
-  "description": "Easily add auth to your mini-app with this library. This library implements the Local First Auth specification client side, allowing you to skip building user management and auth. .",
+  "description": "Easily add auth to your mini-app with this library. This library implements the Local First Auth specification client side, allowing you to skip building user management and auth.",
   "author": "Daniel Mathews <danny@antlerbrowser.com>",
   "license": "MIT",
   "type": "module",
