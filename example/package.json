@@ -1,5 +1,5 @@
 {
-  "name": "irl-onboarding-example",
+  "name": "local-first-auth-example",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "irl-browser-onboarding": "file:..",
+    "local-first-auth": "file:..",
     "react": "^19.2.1",
     "react-dom": "^19.2.1"
   },

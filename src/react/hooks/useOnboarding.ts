@@ -1,15 +1,15 @@
 /**
- * React hook for IRL Browser onboarding
+ * React hook for Local First Auth onboarding
  */
 
 import { useState, useEffect } from 'react'
 import { getCurrentProfile } from '../../core/profile'
 import { hasProfile } from '../../core/storage'
-import { hasIRLBrowserAPI } from '../../core/api'
-import { isIRLBrowser } from '../../utils/deviceDetection'
+import { hasLocalFirstAuthAPI } from '../../core/api'
+import { isLocalFirstAuth } from '../../utils/deviceDetection'
 import type { Profile } from '../../types'
 
-export interface UseIrlOnboardingReturn {
+export interface UseOnboardingReturn {
   /**
    * Whether to show onboarding (no API available)
    */
@@ -29,8 +29,8 @@ export interface UseIrlOnboardingReturn {
 /**
  * Hook to check onboarding status and current profile
  */
-export function useIrlOnboarding(): UseIrlOnboardingReturn {
-  const [state, setState] = useState<UseIrlOnboardingReturn>({
+export function useOnboarding(): UseOnboardingReturn {
+  const [state, setState] = useState<UseOnboardingReturn>({
     shouldShowOnboarding: true,
     profile: null,
     isLoading: true
@@ -49,12 +49,12 @@ export function useIrlOnboarding(): UseIrlOnboardingReturn {
 
     let isMounted = true
 
-    // Check IRL Browser status
+    // Check Local First Auth status
     const checkStatus = () => {
       if (!isMounted) return
 
-      const isNative = isIRLBrowser()
-      const hasWeb = hasProfile() && hasIRLBrowserAPI()
+      const isNative = isLocalFirstAuth()
+      const hasWeb = hasProfile() && hasLocalFirstAuthAPI()
       const profile = getCurrentProfile()
 
       setState({
@@ -68,10 +68,10 @@ export function useIrlOnboarding(): UseIrlOnboardingReturn {
     checkStatus()
 
     // If API doesn't exist yet, set up property detector to trigger when it's injected
-    if (!('irlBrowser' in window)) {
+    if (!('localFirstAuth' in window)) {
       let value: any = undefined
 
-      Object.defineProperty(window, 'irlBrowser', {
+      Object.defineProperty(window, 'localFirstAuth', {
         get() {
           return value
         },

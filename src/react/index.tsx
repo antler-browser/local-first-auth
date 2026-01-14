@@ -1,12 +1,12 @@
 /**
- * IRL Browser Onboarding - React Bindings
+ * Local First Auth - React Bindings
  */
 
 // Export all types
 export * from '../types'
 
 // Export React components
-export { IrlOnboarding } from './components/IrlOnboarding'
+export { Onboarding } from './components/Onboarding'
 export { DownloadPrompt } from './components/DownloadPrompt'
 export { CreateAccountFlow } from './components/CreateAccountFlow'
 export { NameStep } from './components/NameStep'
@@ -14,7 +14,8 @@ export { SocialsStep } from './components/SocialsStep'
 export { AvatarStep } from './components/AvatarStep'
 
 // Export React hooks
-export { useIrlOnboarding } from './hooks/useIrlOnboarding'
+export { useOnboarding } from './hooks/useOnboarding'
+export type { UseOnboardingReturn } from './hooks/useOnboarding'
 export { useProfile } from './hooks/useProfile'
 
 // Re-export core utilities for convenience
@@ -30,7 +31,7 @@ export {
 } from '../core/storage'
 
 export {
-  isIRLBrowser,
+  isLocalFirstAuth,
   getPlatform
 } from '../utils/deviceDetection'
 
@@ -44,7 +45,7 @@ export {
 } from '../utils/validation'
 
 export {
-  injectIRLBrowserAPI,
-  removeIRLBrowserAPI,
-  hasIRLBrowserAPI
+  injectLocalFirstAuthAPI,
+  removeLocalFirstAuthAPI,
+  hasLocalFirstAuthAPI
 } from '../core/api'

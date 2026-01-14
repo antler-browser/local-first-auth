@@ -1,5 +1,5 @@
 /**
- * IRL Browser Onboarding - Core Package
+ * Local First Auth - Core Package
  * Vanilla JS implementation
  */
 
@@ -23,11 +23,11 @@ export {
 export { createProfile, getCurrentProfile, updateProfile } from './profile'
 
 // Export API
-export { injectIRLBrowserAPI, removeIRLBrowserAPI, hasIRLBrowserAPI } from './api'
+export { injectLocalFirstAuthAPI, removeLocalFirstAuthAPI, hasLocalFirstAuthAPI } from './api'
 
 // Export device detection
 export {
-  isIRLBrowser,
+  isLocalFirstAuth,
   getPlatform
 } from '../utils/deviceDetection'
 

@@ -1,7 +1,7 @@
 {
-  "name": "irl-browser-onboarding",
-  "version": "1.3.0",
-  "description": "Onboarding UI for IRL Browser mini-apps - download app or create one-time account",
+  "name": "local-first-auth",
+  "version": "1.0.0",
+  "description": "Easily add auth to your mini-app with this library. This library implements the Local First Auth specification client side, allowing you to skip building user management and auth. .",
   "author": "Daniel Mathews <danny@antlerbrowser.com>",
   "license": "MIT",
   "type": "module",
@@ -52,16 +52,17 @@
     }
   },
   "keywords": [
-    "irl-browser",
-    "antler",
-    "onboarding",
+    "local-first-auth",
+    "local-first",
     "authentication",
+    "antler",
     "did",
     "decentralized-identity",
-    "mini-app"
+    "mini-app",
+    "onboarding"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/antler-browser/irl-browser-onboarding"
+    "url": "https://github.com/antler-browser/local-first-auth"
   }
 }

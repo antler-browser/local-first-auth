@@ -20,7 +20,7 @@ export function useProfile(): Profile | null {
 
     // Listen for storage changes
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'irl-onboarding:profile' || e.key === null) {
+      if (e.key === 'local-first-auth:profile' || e.key === null) {
         const updatedProfile = getCurrentProfile()
         setProfile(updatedProfile)
       }

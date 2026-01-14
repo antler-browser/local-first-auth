@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { IrlOnboarding } from 'irl-browser-onboarding/react'
+import { Onboarding } from 'local-first-auth/react'
 
 type Mode = 'choice' | 'download-prompt'
 
@@ -21,9 +21,9 @@ function FullFlowDemo() {
 
   return (
     <div className="demo">
-      <h2>Full Flow Demo: IrlOnboarding Component</h2>
+      <h2>Full Flow Demo: Onboarding Component</h2>
       <p>
-        This demo shows the complete <code>&lt;IrlOnboarding /&gt;</code> component with all modes.
+        This demo shows the complete <code>&lt;Onboarding /&gt;</code> component with all modes.
       </p>
 
       {!completed ? (
@@ -61,7 +61,7 @@ function FullFlowDemo() {
           </div>
 
           <div className="onboarding-container">
-            <IrlOnboarding
+            <Onboarding
               mode={mode}
               skipSocialStep={skipSocialStep}
               skipAvatarStep={skipAvatarStep}
@@ -87,7 +87,7 @@ function FullFlowDemo() {
           <li><strong>Skip Options:</strong> Test optional social/avatar steps</li>
           <li><strong>DID Generation:</strong> Creates Ed25519 keypair and did:key identifier</li>
           <li><strong>LocalStorage:</strong> Persists profile and private key</li>
-          <li><strong>Mock API Injection:</strong> Injects window.irlBrowser after creation</li>
+          <li><strong>Mock API Injection:</strong> Injects window.localFirstAuth after creation</li>
         </ul>
       </div>
     </div>

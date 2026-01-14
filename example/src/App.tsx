@@ -19,7 +19,7 @@ function App() {
   return (
     <div className="app">
       <header className="header">
-        <h1>IRL Browser Onboarding - Example App</h1>
+        <h1>Local First Auth - Example App</h1>
         <p className="subtitle">
           Test all features without bloating the npm package
         </p>

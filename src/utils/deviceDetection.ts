@@ -3,14 +3,14 @@
  */
 
 /**
- * Check if running in an IRL Browser
+ * Check if running in a Local First Auth compatible app
  */
-export function isIRLBrowser(): boolean {
+export function isLocalFirstAuth(): boolean {
   if (typeof window === 'undefined') {
     return false
   }
 
-  return !!(window as any).irlBrowser
+  return !!(window as any).localFirstAuth
 }
 
 /**

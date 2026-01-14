@@ -5,7 +5,7 @@
 import type { Profile, SocialLink } from '../types'
 import { generateProfileKeys } from './crypto'
 import { saveProfile, savePrivateKey, getProfile, getPrivateKey } from './storage'
-import { injectIRLBrowserAPI } from './api'
+import { injectLocalFirstAuthAPI } from './api'
 
 /**
  * Create a new profile with DID and keys
@@ -35,8 +35,8 @@ export async function createProfile(
   })
   savePrivateKey(privateKey)
 
-  // Inject IRL Browser API
-  injectIRLBrowserAPI()
+  // Inject Local First Auth API
+  injectLocalFirstAuthAPI()
 
   console.log('Profile created successfully:', {
     did,

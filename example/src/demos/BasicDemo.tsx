@@ -1,7 +1,7 @@
-import { useIrlOnboarding, useProfile } from 'irl-browser-onboarding/react'
+import { useOnboarding, useProfile } from 'local-first-auth/react'
 
 function BasicDemo() {
-  const { shouldShowOnboarding, profile, isLoading } = useIrlOnboarding()
+  const { shouldShowOnboarding, profile, isLoading } = useOnboarding()
   const profileFromHook = useProfile()
 
   // Derive values for display
@@ -10,12 +10,12 @@ function BasicDemo() {
   const hasWebAccount = profile !== null
 
   const simulateNativeApp = () => {
-    // Inject a mock native API to simulate IRL Browser app
-    (window as any).irlBrowser = {
+    // Inject a mock native API to simulate Local First Auth app
+    (window as any).localFirstAuth = {
       getProfileDetails: async () => 'mock.native.jwt',
       getAvatar: async () => null,
-      getBrowserDetails: () => ({
-        name: 'Native IRL Browser',
+      getAppDetails: () => ({
+        name: 'Native Local First Auth',
         version: '1.0.0',
         platform: 'browser' as const,
         supportedPermissions: [],
@@ -28,9 +28,9 @@ function BasicDemo() {
 
   return (
     <div className="demo">
-      <h2>Basic Demo: useIrlOnboarding Hook</h2>
+      <h2>Basic Demo: useOnboarding Hook</h2>
       <p>
-        This demo shows the state detection from <code>useIrlOnboarding()</code> hook.
+        This demo shows the state detection from <code>useOnboarding()</code> hook.
       </p>
 
       <div className="status-grid">
@@ -105,17 +105,17 @@ function BasicDemo() {
 
       <div className="actions">
         <button onClick={simulateNativeApp} className="action-btn">
-          Simulate Native IRL Browser
+          Simulate Native Local First Auth
         </button>
         <p className="hint">
-          Click to inject a mock <code>window.irlBrowser</code> API
+          Click to inject a mock <code>window.localFirstAuth</code> API
         </p>
       </div>
 
       <div className="explanation">
         <h3>What This Tests:</h3>
         <ul>
-          <li><code>useIrlOnboarding()</code> hook state detection</li>
+          <li><code>useOnboarding()</code> hook state detection</li>
           <li><code>useProfile()</code> hook profile access</li>
           <li>Native app vs web account detection</li>
           <li>LocalStorage persistence across page reloads</li>

@@ -1,6 +1,6 @@
 /**
- * IRL Browser Onboarding Types
- * Compatible with IRL Browser Specification
+ * Local First Auth Types
+ * Compatible with Local First Auth Specification
  */
 
 // ============================================================================
@@ -51,10 +51,10 @@ export interface ProfileKeys {
 }
 
 // ============================================================================
-// IRL Browser API Types (from specification)
+// Local First Auth API Types (from specification)
 // ============================================================================
 
-export interface IRLBrowser {
+export interface LocalFirstAuth {
   /**
    * Get profile details as a signed JWT
    */
@@ -66,9 +66,9 @@ export interface IRLBrowser {
   getAvatar(): Promise<string | null>
 
   /**
-   * Get details about the IRL Browser
+   * Get details about the Local First Auth app
    */
-  getBrowserDetails(): BrowserDetails
+  getAppDetails(): AppDetails
 
   /**
    * Request additional permissions (future use)
@@ -81,7 +81,7 @@ export interface IRLBrowser {
   close(): void
 }
 
-export interface BrowserDetails {
+export interface AppDetails {
   name: string
   version: string
   platform: 'ios' | 'android' | 'browser'
@@ -118,8 +118,8 @@ export interface StoredProfile {
 }
 
 export interface StorageKeys {
-  PROFILE: 'irl-onboarding:profile'
-  PRIVATE_KEY: 'irl-onboarding:privateKey'
+  PROFILE: 'local-first-auth:profile'
+  PRIVATE_KEY: 'local-first-auth:privateKey'
 }
 
 // ============================================================================
@@ -191,7 +191,7 @@ export interface CustomStyles {
 // Component Props Types (React)
 // ============================================================================
 
-export interface IrlOnboardingProps extends Omit<OnboardingConfig, 'container'> {
+export interface OnboardingProps extends Omit<OnboardingConfig, 'container'> {
   children?: React.ReactNode
 }
 

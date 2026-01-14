@@ -1,19 +1,19 @@
-# IRL Browser Onboarding
+# Local First Auth
 
-When users don't have an IRL Browser mobile app installed, this package gives them options to either create a one-time account or download the Antler app.
+When users don't have a Local First Auth mobile app installed (like Antler), this package gives them options to either create a one-time account or download the app.
 
-This allows you to skip building user management and authentication systems. Users with an IRL Browser app can login with their existing profile, while users without one can still access your mini-app through the one-time account option.
+This allows you to skip building user management and authentication systems. Users with a Local First Auth app can login with their existing profile, while users without one can still access your mini-app through the one-time account option.
 
 ## Demo
 
-![IRL Browser Onboarding Demo](https://github.com/antler-browser/irl-browser-onboarding/blob/main/demo.gif?raw=true)
+![Local First Auth Demo](https://github.com/AntlerBrowser/local-first-auth/blob/main/demo.gif?raw=true)
 
 
 ## Features
 
 - **Dual onboarding paths**: Download app or create web account
 - **DID-based authentication**: Uses W3C Decentralized Identifiers (did:key)
-- **IRL Browser API compatible**: Generates profiles that work identically to Antler
+- **Local First Auth API compatible**: Generates profiles that work identically to Antler
 - **Zero configuration**: Works out-of-the-box with sensible defaults
 - **Customizable styling**: Match your mini-app's branding
 - **Tiny bundle**: Minimal dependencies
@@ -22,7 +22,7 @@ This allows you to skip building user management and authentication systems. Use
 ## Installation
 
 ```bash
-npm install irl-browser-onboarding
+npm install local-first-auth
 ```
 
 ## Quick Start
@@ -30,15 +30,15 @@ npm install irl-browser-onboarding
 ### React
 
 ```tsx
-import { IrlOnboarding } from 'irl-browser-onboarding/react'
+import { Onboarding } from 'local-first-auth/react'
 
 function App() {
-  const hasIrlBrowser = typeof window !== 'undefined' && window.irlBrowser
-  const [showOnboarding, setShowOnboarding] = useState(!hasIrlBrowser)
+  const hasLocalFirstAuth = typeof window !== 'undefined' && window.localFirstAuth
+  const [showOnboarding, setShowOnboarding] = useState(!hasLocalFirstAuth)
 
   if (showOnboarding) {
     return (
-      <IrlOnboarding
+      <Onboarding
         mode="choice" // Shows both download and create account options
         onComplete={(profile) => {
           console.log('Profile created:', profile)
@@ -56,14 +56,14 @@ function App() {
 ### Vanilla JavaScript
 
 ```js
-import { createOnboarding } from 'irl-browser-onboarding'
+import { createOnboarding } from 'local-first-auth'
 
 const onboarding = createOnboarding({
   container: '#onboarding-root',
   mode: 'choice',
   onComplete: (profile) => {
     console.log('Profile created:', profile)
-    // window.irlBrowser is now available
+    // window.localFirstAuth is now available
   }
 })
 ```
@@ -74,14 +74,14 @@ const onboarding = createOnboarding({
 Shows both options: download Antler app or create one-time account.
 
 ```tsx
-<IrlOnboarding mode="choice" />
+<Onboarding mode="choice" />
 ```
 
 ### `download-prompt`
 Only shows download buttons for iOS and Android.
 
 ```tsx
-<IrlOnboarding mode="download-prompt" />
+<Onboarding mode="download-prompt" />
 ```
 
 ## Customization
@@ -89,7 +89,7 @@ Only shows download buttons for iOS and Android.
 ### Skip Steps
 
 ```tsx
-<IrlOnboarding
+<Onboarding
   skipSocialStep={true}   // Skip social links step
   skipAvatarStep={true}   // Skip avatar upload step
 />
@@ -98,7 +98,7 @@ Only shows download buttons for iOS and Android.
 ### Custom Styling
 
 ```tsx
-<IrlOnboarding
+<Onboarding
   customStyles={{
     primaryColor: '#403B51',
     backgroundColor: '#ffffff',
@@ -129,20 +129,20 @@ When a user creates a one-time account:
 
 1. **DID Generation**: Generates an Ed25519 keypair and did:key identifier
 2. **Profile Storage**: Saves profile data to LocalStorage
-3. **API Injection**: Injects `window.irlBrowser` object
-4. **JWT Signing**: All API methods return signed JWTs (compatible with IRL Browser spec)
+3. **API Injection**: Injects `window.localFirstAuth` object
+4. **JWT Signing**: All API methods return signed JWTs (compatible with Local First Auth spec)
 
-The generated profile works identically to a profile from an IRL Browser mobile app. You can use this package to create a one-time account for users who do not have an IRL Browser mobile app installed and do not want to download one. Your backend can verify JWTs the same way it would for a profile from an IRL Browser mobile app. 
+The generated profile works identically to a profile from a Local First Auth mobile app. You can use this package to create a one-time account for users who do not have a Local First Auth mobile app installed and do not want to download one. Your backend can verify JWTs the same way it would for a profile from a Local First Auth mobile app.
 
 ## API Reference
 
 ### React Components
 
-#### `<IrlOnboarding />`
+#### `<Onboarding />`
 Main wrapper component.
 
 ```tsx
-interface IrlOnboardingProps {
+interface OnboardingProps {
   mode?: 'download-prompt' | 'choice'
   skipSocialStep?: boolean
   skipAvatarStep?: boolean
@@ -176,13 +176,13 @@ interface CreateAccountFlowProps {
 
 ### React Hooks
 
-#### `useIrlOnboarding()`
-Hook for detecting IRL Browser status and determining whether to show onboarding.
+#### `useOnboarding()`
+Hook for detecting Local First Auth status and determining whether to show onboarding.
 
 ```tsx
-import { useIrlOnboarding } from 'irl-browser-onboarding/react'
+import { useOnboarding } from 'local-first-auth/react'
 
-const { shouldShowOnboarding, profile, isLoading } = useIrlOnboarding()
+const { shouldShowOnboarding, profile, isLoading } = useOnboarding()
 
 // Returns:
 // - shouldShowOnboarding: boolean (true if no API available)
@@ -199,7 +199,7 @@ const { shouldShowOnboarding, profile, isLoading } = useIrlOnboarding()
 Hook for accessing the current user profile.
 
 ```tsx
-import { useProfile } from 'irl-browser-onboarding/react'
+import { useProfile } from 'local-first-auth/react'
 
 const profile = useProfile()
 // Returns Profile | null
@@ -215,19 +215,19 @@ import {
   updateProfile,
   hasProfile,
   clearProfile
-} from 'irl-browser-onboarding'
+} from 'local-first-auth'
 
 // Device detection
 import {
-  isIRLBrowser
-} from 'irl-browser-onboarding'
+  isLocalFirstAuth
+} from 'local-first-auth'
 
 // Social validation
 import {
   validateHandle,
   normalizeHandle,
   createSocialLink
-} from 'irl-browser-onboarding'
+} from 'local-first-auth'
 ```
 
 ## Storage
@@ -236,31 +236,31 @@ Profile data is stored in LocalStorage:
 
 ```js
 {
-  'irl-onboarding:profile': {
+  'local-first-auth:profile': {
     did: 'did:key:z6Mk...',
     name: 'Alice Anderson',
     socials: [{platform: 'INSTAGRAM', handle: 'alice'}],
     avatar: 'data:image/jpeg;base64,...'
   },
-  'irl-onboarding:privateKey': 'base64-encoded-64-byte-key'
+  'local-first-auth:privateKey': 'base64-encoded-64-byte-key'
 }
 ```
 
 ## Window API
 
-After profile creation, `window.irlBrowser` is injected with these methods:
+After profile creation, `window.localFirstAuth` is injected with these methods:
 
 ```ts
-interface IRLBrowser {
+interface LocalFirstAuth {
   getProfileDetails(): Promise<string>  // Returns signed JWT
   getAvatar(): Promise<string | null>   // Returns signed JWT with avatar
-  getBrowserDetails(): BrowserDetails
+  getAppDetails(): AppDetails
   requestPermission(permission: string): Promise<boolean>
   close(): void
 }
 ```
 
-All methods are compatible with the [IRL Browser Specification](https://github.com/antler/irl-browser-specification). There users can generate a one-time account your backend can verify JWTs that are generated by this package the same way it would for a profile from an IRL Browser mobile app.
+All methods are compatible with the [Local First Auth Specification](./docs/local-first-auth-spec.md). Users can generate a one-time account and your backend can verify JWTs that are generated by this package the same way it would for a profile from a Local First Auth mobile app.
 
 ## Development & Testing
 
@@ -275,7 +275,7 @@ npm run dev:example
 ```
 
 **What it tests:**
-- **Basic Demo**: `useIrlOnboarding()` and `useProfile()` hooks, state detection, native API simulation
+- **Basic Demo**: `useOnboarding()` and `useProfile()` hooks, state detection, native API simulation
 - **Full Flow Demo**: Complete onboarding flow with both modes (choice, download-prompt)
 - **Core API Demo**: Vanilla JS testing of crypto, storage, profile, validation, and mock API injection
 - **Custom Style Demo**: Custom theming with `customStyles` prop
@@ -298,7 +298,34 @@ import type {
   Profile,
   SocialLink,
   SocialPlatform,
-  IRLBrowser,
+  LocalFirstAuth,
   CustomStyles
-} from 'irl-browser-onboarding'
+} from 'local-first-auth'
 ```
+
+## Migration from v1 (irl-browser-onboarding)
+
+If you're migrating from `irl-browser-onboarding` v1:
+
+### Package name change
+```bash
+npm uninstall irl-browser-onboarding
+npm install local-first-auth
+```
+
+### Import changes
+```tsx
+// Before
+import { IrlOnboarding, useIrlOnboarding } from 'irl-browser-onboarding/react'
+
+// After
+import { Onboarding, useOnboarding } from 'local-first-auth/react'
+```
+
+### API changes
+- `window.irlBrowser` → `window.localFirstAuth`
+- `getBrowserDetails()` → `getAppDetails()`
+- `isIRLBrowser()` → `isLocalFirstAuth()`
+
+### Storage migration
+Existing user profiles are automatically migrated from the old storage keys to the new ones on first load.

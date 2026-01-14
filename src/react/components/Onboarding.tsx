@@ -1,23 +1,23 @@
 /**
- * IRL Onboarding Component
+ * Onboarding Component
  * Main wrapper component that handles different modes
  */
 
 import React, { useState } from 'react'
-import type { IrlOnboardingProps } from '../../types'
+import type { OnboardingProps } from '../../types'
 import { DownloadPrompt } from './DownloadPrompt'
 import { CreateAccountFlow } from './CreateAccountFlow'
 import { DownloadBadges } from './DownloadBadges'
 import { usePressState } from '../hooks/usePressState'
 
-export function IrlOnboarding({
+export function Onboarding({
   mode = 'choice',
   skipSocialStep = false,
   skipAvatarStep = false,
   customStyles = {},
   onComplete,
   children
-}: IrlOnboardingProps) {
+}: OnboardingProps) {
   const [selectedMode, setSelectedMode] = useState<'download' | 'create' | null>(
     mode === 'choice' ? null : 'download'
   )

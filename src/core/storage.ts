@@ -5,8 +5,8 @@
 import type { StoredProfile } from '../types'
 
 const STORAGE_KEYS = {
-  PROFILE: 'irl-onboarding:profile',
-  PRIVATE_KEY: 'irl-onboarding:privateKey',
+  PROFILE: 'local-first-auth:profile',
+  PRIVATE_KEY: 'local-first-auth:privateKey',
 } as const
 
 /**

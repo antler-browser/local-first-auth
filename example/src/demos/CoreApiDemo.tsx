@@ -8,14 +8,14 @@ import {
   savePrivateKey,
   clearProfile,
   createProfile,
-  injectIRLBrowserAPI,
+  injectLocalFirstAuthAPI,
   validateHandle,
   normalizeHandle,
   createSocialLink,
   type Profile,
   type SocialPlatform,
   type SocialLink,
-} from 'irl-browser-onboarding'
+} from 'local-first-auth'
 
 function CoreApiDemo() {
   const [output, setOutput] = useState<string>('')
@@ -95,14 +95,14 @@ function CoreApiDemo() {
     log(`  DID: ${profile.did}`)
     log(`  Socials: ${profile.socials?.map(s => s.platform).join(', ')}`)
 
-    const hasAPI = (window as any).irlBrowser !== undefined
+    const hasAPI = (window as any).localFirstAuth !== undefined
     log(`✓ Mock API injected: ${hasAPI}`)
 
     if (hasAPI) {
-      const jwt = await (window as any).irlBrowser.getProfileDetails()
+      const jwt = await (window as any).localFirstAuth.getProfileDetails()
       log(`✓ API getProfileDetails(): ${jwt.substring(0, 50)}...`)
 
-      const avatar = await (window as any).irlBrowser.getAvatar()
+      const avatar = await (window as any).localFirstAuth.getAvatar()
       log(`✓ API getAvatar(): ${avatar || 'null'}`)
     }
   }
@@ -163,7 +163,7 @@ function CoreApiDemo() {
     setOutput('')
     log('=== Testing Mock API Injection ===')
 
-    const before = (window as any).irlBrowser !== undefined
+    const before = (window as any).localFirstAuth !== undefined
     log(`Before injection: ${before}`)
 
     // Generate keys and profile
@@ -181,13 +181,13 @@ function CoreApiDemo() {
     log('✓ Saved profile and private key to LocalStorage')
 
     // Inject API (reads from LocalStorage)
-    injectIRLBrowserAPI()
+    injectLocalFirstAuthAPI()
 
-    const after = (window as any).irlBrowser !== undefined
+    const after = (window as any).localFirstAuth !== undefined
     log(`✓ After injection: ${after}`)
-    log(`✓ window.irlBrowser.getProfileDetails: ${typeof (window as any).irlBrowser?.getProfileDetails}`)
-    log(`✓ window.irlBrowser.getAvatar: ${typeof (window as any).irlBrowser?.getAvatar}`)
-    log(`✓ window.irlBrowser.getBrowserDetails: ${typeof (window as any).irlBrowser?.getBrowserDetails}`)
+    log(`✓ window.localFirstAuth.getProfileDetails: ${typeof (window as any).localFirstAuth?.getProfileDetails}`)
+    log(`✓ window.localFirstAuth.getAvatar: ${typeof (window as any).localFirstAuth?.getAvatar}`)
+    log(`✓ window.localFirstAuth.getAppDetails: ${typeof (window as any).localFirstAuth?.getAppDetails}`)
   }
 
   return (
@@ -244,7 +244,7 @@ function CoreApiDemo() {
           <li><strong>Profile:</strong> createProfile() - Complete profile creation flow with API injection</li>
           <li><strong>Validation:</strong> validateHandle() - Social handle validation for 23+ platforms</li>
           <li><strong>Social Links:</strong> createSocialLink() - Create platform-specific social links</li>
-          <li><strong>Mock API:</strong> injectIRLBrowserAPI() - Inject window.irlBrowser API</li>
+          <li><strong>Mock API:</strong> injectLocalFirstAuthAPI() - Inject window.localFirstAuth API</li>
           <li><strong>Image:</strong> Basic image loading and preview</li>
         </ul>
       </div>

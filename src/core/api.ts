@@ -1,17 +1,17 @@
 /**
- * Mock IRL Browser API implementation
- * Implements the IRLBrowser interface from the IRL Browser Specification
+ * Mock Local First Auth API implementation
+ * Implements the LocalFirstAuth interface from the Local First Auth Specification
  */
 
-import type { IRLBrowser, BrowserDetails, JWTPayload } from '../types'
+import type { LocalFirstAuth, AppDetails, JWTPayload } from '../types'
 import { getProfile, getPrivateKey } from './storage'
 import { createJWT } from './crypto'
 
 /**
- * Implementation of the IRL Browser API
- * This gets injected as window.irlBrowser after profile creation
+ * Implementation of the Local First Auth API
+ * This gets injected as window.localFirstAuth after profile creation
  */
-export class MockIRLBrowser implements IRLBrowser {
+export class MockLocalFirstAuth implements LocalFirstAuth {
 
   /**
    * Get profile details as a signed JWT
@@ -31,7 +31,7 @@ export class MockIRLBrowser implements IRLBrowser {
       aud: window.location.origin,
       iat: now,
       exp: now + 120, // 2 minutes expiration
-      type: 'irl:profile:details',
+      type: 'localFirstAuth:profile:details',
       data: {
         did: profile.did,
         name: profile.name,
@@ -66,7 +66,7 @@ export class MockIRLBrowser implements IRLBrowser {
       aud: window.location.origin,
       iat: now,
       exp: now + 120, // 2 minutes expiration
-      type: 'irl:avatar',
+      type: 'localFirstAuth:avatar',
       data: {
         did: profile.did,
         avatar: profile.avatar
@@ -78,12 +78,12 @@ export class MockIRLBrowser implements IRLBrowser {
   }
 
   /**
-   * Get details about the IRL Browser
+   * Get details about the Local First Auth app
    */
-  getBrowserDetails(): BrowserDetails {
+  getAppDetails(): AppDetails {
     return {
-      name: 'IRL Browser Onboarding',
-      version: '1.0.0',
+      name: 'Local First Auth',
+      version: '2.0.0',
       platform: 'browser',
       supportedPermissions: ['profile']
     }
@@ -106,7 +106,7 @@ export class MockIRLBrowser implements IRLBrowser {
 
   /**
    * Close the WebView (no-op for web version)
-   * In a real IRL Browser app, this would close the WebView and return to QR scanner
+   * In a real Local First Auth app, this would close the WebView and return to QR scanner
    */
   close(): void {
     console.log('close() called - no-op in web version')
@@ -116,41 +116,41 @@ export class MockIRLBrowser implements IRLBrowser {
 }
 
 /**
- * Inject the IRL Browser API into window object
+ * Inject the Local First Auth API into window object
  */
-export function injectIRLBrowserAPI(): void {
+export function injectLocalFirstAuthAPI(): void {
   if (typeof window === 'undefined') {
-    console.warn('Cannot inject IRL Browser API: window is undefined (not in browser)')
+    console.warn('Cannot inject Local First Auth API: window is undefined (not in browser)')
     return
   }
 
-  if ((window as any).irlBrowser) {
-    console.warn('IRL Browser API already exists on window object')
+  if ((window as any).localFirstAuth) {
+    console.warn('Local First Auth API already exists on window object')
     return
   }
 
   // Create and inject the API
-  const api = new MockIRLBrowser()
-  ;(window as any).irlBrowser = api
+  const api = new MockLocalFirstAuth()
+  ;(window as any).localFirstAuth = api
 
-  console.log('IRL Browser API injected successfully')
+  console.log('Local First Auth API injected successfully')
 }
 
 /**
- * Remove the IRL Browser API from window object
+ * Remove the Local First Auth API from window object
  */
-export function removeIRLBrowserAPI(): void {
+export function removeLocalFirstAuthAPI(): void {
   if (typeof window === 'undefined') {
     return
   }
 
-  delete (window as any).irlBrowser
-  console.log('IRL Browser API removed')
+  delete (window as any).localFirstAuth
+  console.log('Local First Auth API removed')
 }
 
 /**
- * Check if IRL Browser API is available
+ * Check if Local First Auth API is available
  */
-export function hasIRLBrowserAPI(): boolean {
-  return typeof window !== 'undefined' && !!(window as any).irlBrowser
+export function hasLocalFirstAuthAPI(): boolean {
+  return typeof window !== 'undefined' && !!(window as any).localFirstAuth
 }

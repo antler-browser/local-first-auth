@@ -1,4 +1,4 @@
-import { IrlOnboarding } from 'irl-browser-onboarding/react'
+import { Onboarding } from 'local-first-auth/react'
 import { useState } from 'react'
 
 function CustomStyleDemo() {
@@ -18,12 +18,12 @@ function CustomStyleDemo() {
     <div className="demo">
       <h2>Custom Style Demo: Styling Props</h2>
       <p>
-        Test the <code>customStyles</code> prop to theme the <code>&lt;IrlOnboarding /&gt;</code> component.
+        Test the <code>customStyles</code> prop to theme the <code>&lt;Onboarding /&gt;</code> component.
       </p>
 
       {!completed ? (
         <div style={{ maxWidth: '500px', margin: '0 auto' }}>
-          <IrlOnboarding
+          <Onboarding
             mode="choice"
             customStyles={customStyles}
             onComplete={(profile) => {
@@ -54,7 +54,7 @@ function CustomStyleDemo() {
   inputRadius: '8px',
 }
 
-<IrlOnboarding
+<Onboarding
   mode="choice"
   customStyles={customStyles}
   onComplete={handleComplete}
