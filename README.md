@@ -22,7 +22,8 @@ Drawbacks:
 
 ## Demo
 
-![Local First Auth Demo](https://github.com/AntlerBrowser/local-first-auth/blob/main/demo.gif?raw=true)
+![local-first-auth-flow](https://github.com/user-attachments/assets/a04e6f08-1635-4522-97f0-9507c1ca718c)
+
 
 ## Features
 
