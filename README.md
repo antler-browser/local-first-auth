@@ -1,36 +1,32 @@
 # Local First Auth JS Library
 
-An easy way to add auth to your web app - no servers, no passwords, no third-party auth providers.
+This library provides an easy way to add auth to your web app - no servers, no passwords, no third-party auth providers.
 
-# Client-Side Auth
+## Onboarding flow
+
+![local-first-auth-flow](https://github.com/user-attachments/assets/a04e6f08-1635-4522-97f0-9507c1ca718c)
+
+# In Between Static Websites and Traditional Auth Systems
 
 <img width="1200" height="600" alt="static-vs-trad-auth-2" src="https://github.com/user-attachments/assets/8f5abb22-3ba7-4752-a529-94ea02b6aaeb" />
 
+Show the `Onboarding` component to let users pick a name (and optionally an avatar) — behind the scenes, the user gets a public and private key pair that is stored on their device. When your app needs to authenticate a request, call `getProfileDetails()` to get a signed JWT containing the user's profile. Pass the JWT with any request so your backend can verify the signature, confirm who made the request, and extract the profile data. 
 
-This library provides a simple way to add auth to your web app without the need for email or passwords.
+This is a great fit for apps where people are physically present together in the same place, such as:
 
-Use the `Onboarding` component to let users enter a name (and optionally add an avatar). Behind the scenes, when a user enters in these details, they get a unique public and private key pair stored on their device. When your app needs to authenticate a request, call `getProfileDetails()` to generate a signed JWT containing the user's profile. Your backend can then verify the signature is valid and extract the profile data.
-
-The usecase for this library is particularly useful if you are builing a web app that is going to be used by a small number of users who are physically present at the same time.
-
-Think:
 - Meetups
 - Social clubs
 - Local community events
 - Game nights with friends
-- Any lightweight gathering where people are physically present
+- Any lightweight gathering where people are in the same place
 
-Drawbacks:
-- Since this is a client-side library, if a user deletes their browsering history or clears their local storage, they will lose their keys and will have to create a new account Therefore, use this library only if it is useful to add temporary / one-time accounts for simple apps that do not require a persistent account.
-
-## Demo
-
-![local-first-auth-flow](https://github.com/user-attachments/assets/a04e6f08-1635-4522-97f0-9507c1ca718c)
-
+Drawbacks of using this library:
+- When a user clears their browsing data, their keys are lost and they'll need to create a new account. Therefore this library is best suited for apps where temporary or one-time accounts are useful. If you need a persistent account, a traditional email-based auth system is a better fit as your users can access their account from multiple devices and not have to create a new account if they clear their browsing data.
 
 ## Features
 
 - **Simple 3-step onboarding**: Name, socials, avatar
+- **Skip any screens you don't need**: You can skip the add socials and the avatar screens if your app doesn't need them.
 - **DID-based authentication**: Uses W3C Decentralized Identifiers (did:key)
 - **Local First Auth API compatible**: Generates profiles compatible with any Local First Auth app
 - **Zero configuration**: Works out-of-the-box with sensible defaults
@@ -292,29 +288,14 @@ import type {
 } from 'local-first-auth'
 ```
 
-## Migration from v1 (irl-browser-onboarding)
+## Long Term Storage of your keys
 
-If you're migrating from `irl-browser-onboarding` v1:
+This library was inspired by a recent trip to China. ie) One really innovative user experience in China is the idea that you don’t always need to download an app, sometimes the better experience is to just scan a QR code. Here is an example: When I enter a cafe, I don't have to download the cafe's app, I just scan a QR code and it allows me to pay for my coffee and track my loyalty points - no signup or app download required.
 
-### Package name change
-```bash
-npm uninstall irl-browser-onboarding
-npm install local-first-auth
-```
+This works because of WeChat's prominence in China. When I entered the cafe, I opened up WeChat and scanned the QR code. The cafe has built a WeChat mini app that uses my WeChat Id and WeChat Pay to authenticate me to allow me to pay for my coffee and track my loyalty points.
 
-### Import changes
-```tsx
-// Before
-import { IrlOnboarding, useIrlOnboarding } from 'irl-browser-onboarding/react'
+It's cool and really convenient UX for users, BUT it would be cooler if we could build something like this but use open standards (so we don't need to have a super app like WeChat). This library uses the [Local First Auth specification](https://antlerbrowser.com/local-first-auth-specification) to make it easy to build in simple auth into your web app.
 
-// After
-import { Onboarding, useOnboarding } from 'local-first-auth/react'
-```
+However, [Antler](https://github.com/antler-browser/antler) is a demo app that showcases how any native mobile app can integrate this spec into their app. When you download Antler, you do the same onboarding process as you would with this library (enter your name and optionally an avatar). It generates a public and private key pair that is stored locally on your device. Whenever you scan a QR code using Antler, your profile details are shared with the web app. This means users don't have to go through account creation for every web app you use, and you don't have to worry about losing your keys if you clear your browsing data.
 
-### API changes
-- `window.irlBrowser` → `window.localFirstAuth`
-- `getBrowserDetails()` → `getAppDetails()`
-- `isIRLBrowser()` → `isLocalFirstAuth()`
-
-### Storage migration
-Existing user profiles are automatically migrated from the old storage keys to the new ones on first load.
+My dream would be that if other messaging or event apps like Telegram, Signal, Meetup.com, etc. would build this spec into their app. It would give users the same great UX you get with WeChat but use open standards instead of requiring a super app like WeChat.
