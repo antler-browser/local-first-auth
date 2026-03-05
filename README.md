@@ -4,6 +4,9 @@ An easy way to add auth to your web app - no servers, no passwords, no third-par
 
 # Client-Side Auth
 
+<img width="1200" height="600" alt="static-vs-trad-auth-2" src="https://github.com/user-attachments/assets/8f5abb22-3ba7-4752-a529-94ea02b6aaeb" />
+
+
 This library provides a simple way to add auth to your web app without the need for email or passwords.
 
 Use the `Onboarding` component to let users enter a name (and optionally add an avatar). Behind the scenes, when a user enters in these details, they get a unique public and private key pair stored on their device. When your app needs to authenticate a request, call `getProfileDetails()` to generate a signed JWT containing the user's profile. Your backend can then verify the signature is valid and extract the profile data.
