@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-`local-first-auth` is a TypeScript library providing onboarding UI for Local First Auth mini-apps. It enables users without the Antler app (or another Local First Auth compatible app) to either download the app OR create a one-time web-based account using decentralized identity (DID).
+`local-first-auth` is a TypeScript library providing simple client-side auth for web apps. It enables users to create accounts using decentralized identity (DID) — no servers, no passwords, no third-party auth providers.
 
 ## Common Commands
 
@@ -48,7 +48,7 @@ example/
 - Fully functional test harness covering all library features
 
 **Testing Coverage:**
-- All 6 React components
+- All React components
 - Both hooks (useOnboarding, useProfile)
 - Core crypto/storage/profile modules
 - Social validation for 23+ platforms
@@ -78,7 +78,7 @@ The codebase follows a layered architecture with clear separation of concerns:
 - `imageProcessing.ts`: Browser-based image resize/crop to 512x512px using Canvas API
 
 **React Layer** (`src/react/`): UI framework bindings
-- `components/`: Main `Onboarding` wrapper, download prompts, 3-step account creation flow
+- `components/`: Main `Onboarding` wrapper, 3-step account creation flow (name, socials, avatar)
 - `hooks/`:
   - `useOnboarding()`: Returns `{shouldShowOnboarding, profile, isLoading}` - simplified API for status detection
   - `useProfile()`: Returns current profile or null
@@ -102,12 +102,12 @@ Both output CommonJS and ESM formats with TypeScript declarations and source map
 
 ### Key Integration Points
 
-When the user opens a mini-app:
+When the user opens a web app:
 1. `useOnboarding()` detects if native Local First Auth exists via `window.localFirstAuth` and returns:
    - `shouldShowOnboarding`: Whether to show onboarding UI
    - `profile`: User's web account profile (or null for native app/no account)
    - `isLoading`: Initial loading state
-2. If `shouldShowOnboarding` is true, show choice: download app OR create web account
+2. If `shouldShowOnboarding` is true, show the account creation flow
 3. `createProfile()` in `profile.ts` generates DID, saves to LocalStorage, injects mock API at `window.localFirstAuth`
 4. Mock API returns signed JWTs matching native app format for compatibility
 

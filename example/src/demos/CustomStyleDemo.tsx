@@ -24,7 +24,6 @@ function CustomStyleDemo() {
       {!completed ? (
         <div style={{ maxWidth: '500px', margin: '0 auto' }}>
           <Onboarding
-            mode="choice"
             customStyles={customStyles}
             onComplete={(profile) => {
               console.log('Custom styled onboarding completed:', profile)
@@ -55,7 +54,6 @@ function CustomStyleDemo() {
 }
 
 <Onboarding
-  mode="choice"
   customStyles={customStyles}
   onComplete={handleComplete}
 />`}</pre>

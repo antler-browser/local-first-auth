@@ -1,6 +1,6 @@
 /**
  * Cryptographic utilities for DID generation and JWT signing
- * Ported from irl-browser-simulator
+ * Ported from local-first-auth-simulator
  */
 
 import * as ed25519 from '@stablelib/ed25519'
@@ -82,7 +82,7 @@ async function generateKeyPair(): Promise<{
   const keyPair = ed25519.generateKeyPairFromSeed(seed)
 
   // Ed25519 secretKey is 64 bytes (includes 32-byte seed + 32-byte public key)
-  // Encode as base64 for storage (matching Antler app format)
+  // Encode as base64 for storage
   const privateKey = base64.fromByteArray(keyPair.secretKey)
 
   return {
@@ -126,8 +126,6 @@ export async function generateProfileKeys(): Promise<ProfileKeys> {
 
 /**
  * Create and sign a JWT using Ed25519
- * Matches the Antler IRL Browser app implementation
- *
  * @param payload - JWT payload containing claims
  * @param privateKey - Base64-encoded 64-byte Ed25519 secret key
  * @returns Signed JWT string

@@ -135,18 +135,19 @@ export function NameStep({ onNext, onBack, currentStep, totalSteps, initialValue
       marginTop: '16px',
       WebkitTapHighlightColor: mobileTapHighlightColor
     },
-    buttonSecondary: {
-      width: '100%',
-      padding: '16px',
-      fontSize: '16px',
-      fontWeight: '600',
-      color: textColor,
-      backgroundColor: 'transparent',
+    backButton: {
+      background: 'none',
       border: 'none',
       cursor: 'pointer',
+      fontSize: '16px',
+      fontWeight: '500' as const,
+      color: textColor,
       opacity: 0.6,
+      padding: '4px 0',
       fontFamily,
-      transition: 'transform 0.1s ease, opacity 0.2s',
+      transition: 'opacity 0.2s',
+      alignSelf: 'flex-start' as const,
+      marginBottom: '8px',
       WebkitTapHighlightColor: mobileTapHighlightColor
     }
   }
@@ -154,6 +155,11 @@ export function NameStep({ onNext, onBack, currentStep, totalSteps, initialValue
   return (
     <div style={styles.container}>
       <div style={styles.content}>
+        {onBack && (
+          <button onClick={onBack} style={styles.backButton}>
+            ← Back
+          </button>
+        )}
         <div style={styles.header}>
           {totalSteps > 1 && <div style={styles.progress}>Step {currentStep} of {totalSteps}</div>}
           <h1 style={styles.title}>What's your name?</h1>
@@ -205,32 +211,6 @@ export function NameStep({ onNext, onBack, currentStep, totalSteps, initialValue
           >
             Next
           </button>
-          {onBack && (
-            <button
-              onClick={onBack}
-              style={{
-                ...styles.buttonSecondary,
-                transform: pressedButton === 'back' ? `scale(${mobileButtonPressScale})` : 'scale(1)',
-                opacity: pressedButton === 'back' ? 0.8 : 0.6
-              }}
-              onTouchStart={() => setPressedButton('back')}
-              onTouchEnd={() => setPressedButton(null)}
-              onTouchCancel={() => setPressedButton(null)}
-              onMouseEnter={(e) => {
-                if (!pressedButton) {
-                  ;(e.currentTarget as HTMLElement).style.opacity = '0.8'
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!pressedButton) {
-                  ;(e.currentTarget as HTMLElement).style.opacity = '0.6'
-                  ;(e.currentTarget as HTMLElement).style.transform = 'scale(1)'
-                }
-              }}
-            >
-              Back
-            </button>
-          )}
         </form>
       </div>
     </div>

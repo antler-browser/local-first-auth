@@ -315,12 +315,30 @@ export function SocialsStep({
       fontFamily,
       transition: 'transform 0.1s ease, opacity 0.2s',
       WebkitTapHighlightColor: mobileTapHighlightColor
+    },
+    backButton: {
+      background: 'none',
+      border: 'none',
+      cursor: 'pointer',
+      fontSize: '16px',
+      fontWeight: '500' as const,
+      color: textColor,
+      opacity: 0.6,
+      padding: '4px 0',
+      fontFamily,
+      transition: 'opacity 0.2s',
+      alignSelf: 'flex-start' as const,
+      marginBottom: '8px',
+      WebkitTapHighlightColor: mobileTapHighlightColor
     }
   }
 
   return (
     <div style={styles.container}>
       <div style={styles.content}>
+        <button onClick={onBack} style={styles.backButton}>
+          ← Back
+        </button>
         <div style={styles.header}>
           <div style={styles.progress}>Step {currentStep} of {totalSteps}</div>
           <h1 style={styles.title}>Add your socials</h1>
@@ -398,13 +416,13 @@ export function SocialsStep({
             Next
           </button>
           <button
-            onClick={onBack}
+            onClick={() => onNext([])}
             style={{
               ...styles.buttonSecondary,
-              transform: pressedButton === 'back' ? `scale(${mobileButtonPressScale})` : 'scale(1)',
-              opacity: pressedButton === 'back' ? 0.8 : 0.6
+              transform: pressedButton === 'skip' ? `scale(${mobileButtonPressScale})` : 'scale(1)',
+              opacity: pressedButton === 'skip' ? 0.8 : 0.6
             }}
-            onTouchStart={() => setPressedButton('back')}
+            onTouchStart={() => setPressedButton('skip')}
             onTouchEnd={() => setPressedButton(null)}
             onTouchCancel={() => setPressedButton(null)}
             onMouseEnter={(e) => {
@@ -419,7 +437,7 @@ export function SocialsStep({
               }
             }}
           >
-            Back
+            Skip for now
           </button>
         </div>
       </div>

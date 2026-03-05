@@ -1,21 +1,36 @@
-# Local First Auth
+# Local First Auth JS Library
 
-When users don't have a Local First Auth mobile app installed (like Antler), this package gives them options to either create a one-time account or download the app.
+An easy way to add auth to your web app - no servers, no passwords, no third-party auth providers.
 
-This allows you to skip building user management and authentication systems. Users with a Local First Auth app can login with their existing profile, while users without one can still access your mini-app through the one-time account option.
+# Client-Side Auth
+
+This library provides a simple way to add auth to your web app without the need for email or passwords.
+
+Use the `Onboarding` component to let users enter a name (and optionally add an avatar). Behind the scenes, when a user enters in these details, they get a unique public and private key pair stored on their device. When your app needs to authenticate a request, call `getProfileDetails()` to generate a signed JWT containing the user's profile. Your backend can then verify the signature is valid and extract the profile data.
+
+The usecase for this library is particularly useful if you are builing a web app that is going to be used by a small number of users who are physically present at the same time.
+
+Think:
+- Meetups
+- Social clubs
+- Local community events
+- Game nights with friends
+- Any lightweight gathering where people are physically present
+
+Drawbacks:
+- Since this is a client-side library, if a user deletes their browsering history or clears their local storage, they will lose their keys and will have to create a new account Therefore, use this library only if it is useful to add temporary / one-time accounts for simple apps that do not require a persistent account.
 
 ## Demo
 
 ![Local First Auth Demo](https://github.com/AntlerBrowser/local-first-auth/blob/main/demo.gif?raw=true)
 
-
 ## Features
 
-- **Dual onboarding paths**: Download app or create web account
+- **Simple 3-step onboarding**: Name, socials, avatar
 - **DID-based authentication**: Uses W3C Decentralized Identifiers (did:key)
-- **Local First Auth API compatible**: Generates profiles that work identically to Antler
+- **Local First Auth API compatible**: Generates profiles compatible with any Local First Auth app
 - **Zero configuration**: Works out-of-the-box with sensible defaults
-- **Customizable styling**: Match your mini-app's branding
+- **Customizable styling**: Match your web app's branding
 - **Tiny bundle**: Minimal dependencies
 - **Framework agnostic**: Vanilla JS core + React bindings
 
@@ -39,7 +54,6 @@ function App() {
   if (showOnboarding) {
     return (
       <Onboarding
-        mode="choice" // Shows both download and create account options
         onComplete={(profile) => {
           console.log('Profile created:', profile)
           setShowOnboarding(false)
@@ -49,7 +63,7 @@ function App() {
     )
   }
 
-  return <YourMiniApp />
+  return <YourApp />
 }
 ```
 
@@ -60,28 +74,11 @@ import { createOnboarding } from 'local-first-auth'
 
 const onboarding = createOnboarding({
   container: '#onboarding-root',
-  mode: 'choice',
   onComplete: (profile) => {
     console.log('Profile created:', profile)
     // window.localFirstAuth is now available
   }
 })
-```
-
-## Modes
-
-### `choice` (Recommended)
-Shows both options: download Antler app or create one-time account.
-
-```tsx
-<Onboarding mode="choice" />
-```
-
-### `download-prompt`
-Only shows download buttons for iOS and Android.
-
-```tsx
-<Onboarding mode="download-prompt" />
 ```
 
 ## Customization
@@ -125,14 +122,14 @@ Only shows download buttons for iOS and Android.
 
 ## How It Works
 
-When a user creates a one-time account:
+When a user creates an account:
 
 1. **DID Generation**: Generates an Ed25519 keypair and did:key identifier
 2. **Profile Storage**: Saves profile data to LocalStorage
 3. **API Injection**: Injects `window.localFirstAuth` object
 4. **JWT Signing**: All API methods return signed JWTs (compatible with Local First Auth spec)
 
-The generated profile works identically to a profile from a Local First Auth mobile app. You can use this package to create a one-time account for users who do not have a Local First Auth mobile app installed and do not want to download one. Your backend can verify JWTs the same way it would for a profile from a Local First Auth mobile app.
+The generated profile is compatible with the Local First Auth specification. Your backend can verify JWTs the same way it would for a profile from any Local First Auth compatible app.
 
 ## API Reference
 
@@ -143,22 +140,10 @@ Main wrapper component.
 
 ```tsx
 interface OnboardingProps {
-  mode?: 'download-prompt' | 'choice'
   skipSocialStep?: boolean
   skipAvatarStep?: boolean
   customStyles?: CustomStyles
   onComplete?: (profile: Profile) => void
-}
-```
-
-#### `<DownloadPrompt />`
-Shows iOS/Android download buttons.
-
-```tsx
-interface DownloadPromptProps {
-  title?: string
-  description?: string
-  customStyles?: CustomStyles
 }
 ```
 
@@ -260,7 +245,7 @@ interface LocalFirstAuth {
 }
 ```
 
-All methods are compatible with the [Local First Auth Specification](./docs/local-first-auth-spec.md). Users can generate a one-time account and your backend can verify JWTs that are generated by this package the same way it would for a profile from a Local First Auth mobile app.
+All methods are compatible with the [Local First Auth Specification](./docs/local-first-auth-spec.md). Users can generate an account and your backend can verify JWTs that are generated by this package the same way it would for a profile from any Local First Auth compatible app.
 
 ## Development & Testing
 
@@ -276,7 +261,7 @@ npm run dev:example
 
 **What it tests:**
 - **Basic Demo**: `useOnboarding()` and `useProfile()` hooks, state detection, native API simulation
-- **Full Flow Demo**: Complete onboarding flow with both modes (choice, download-prompt)
+- **Full Flow Demo**: Complete onboarding flow with account creation
 - **Core API Demo**: Vanilla JS testing of crypto, storage, profile, validation, and mock API injection
 - **Custom Style Demo**: Custom theming with `customStyles` prop
 

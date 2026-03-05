@@ -128,11 +128,6 @@ export interface StorageKeys {
 
 export interface OnboardingConfig {
   /**
-   * Mode to display
-   */
-  mode?: 'download-prompt' | 'choice'
-
-  /**
    * Skip the social links step
    */
   skipSocialStep?: boolean
@@ -193,12 +188,6 @@ export interface CustomStyles {
 
 export interface OnboardingProps extends Omit<OnboardingConfig, 'container'> {
   children?: React.ReactNode
-}
-
-export interface DownloadPromptProps {
-  title?: string
-  description?: string
-  customStyles?: CustomStyles
 }
 
 export interface CreateAccountFlowProps {

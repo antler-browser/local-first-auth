@@ -206,12 +206,30 @@ export function AvatarStep({
       fontFamily,
       transition: 'transform 0.1s ease, opacity 0.2s',
       WebkitTapHighlightColor: mobileTapHighlightColor
+    },
+    backButton: {
+      background: 'none',
+      border: 'none',
+      cursor: 'pointer',
+      fontSize: '16px',
+      fontWeight: '500' as const,
+      color: textColor,
+      opacity: 0.6,
+      padding: '4px 0',
+      fontFamily,
+      transition: 'opacity 0.2s',
+      alignSelf: 'flex-start' as const,
+      marginBottom: '8px',
+      WebkitTapHighlightColor: mobileTapHighlightColor
     }
   }
 
   return (
     <div style={styles.container}>
       <div style={styles.content}>
+        <button onClick={onBack} style={styles.backButton}>
+          ← Back
+        </button>
         <div style={styles.header}>
           <div style={styles.progress}>Step {currentStep} of {totalSteps}</div>
           <h1 style={styles.title}>Add your avatar</h1>
@@ -383,31 +401,6 @@ export function AvatarStep({
               </button>
             </>
           )}
-          <button
-            onClick={onBack}
-            style={{
-              ...styles.buttonSecondary,
-              transform: pressedButton === 'back' ? `scale(${mobileButtonPressScale})` : 'scale(1)',
-              opacity: pressedButton === 'back' ? 0.8 : 0.6
-            }}
-            disabled={isProcessing}
-            onTouchStart={() => setPressedButton('back')}
-            onTouchEnd={() => setPressedButton(null)}
-            onTouchCancel={() => setPressedButton(null)}
-            onMouseEnter={(e) => {
-              if (!pressedButton) {
-                ;(e.currentTarget as HTMLElement).style.opacity = '0.8'
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!pressedButton) {
-                ;(e.currentTarget as HTMLElement).style.opacity = '0.6'
-                ;(e.currentTarget as HTMLElement).style.transform = 'scale(1)'
-              }
-            }}
-          >
-            Back
-          </button>
         </div>
       </div>
     </div>

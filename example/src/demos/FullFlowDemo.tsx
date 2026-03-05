@@ -1,10 +1,7 @@
 import { useState } from 'react'
 import { Onboarding } from 'local-first-auth/react'
 
-type Mode = 'choice' | 'download-prompt'
-
 function FullFlowDemo() {
-  const [mode, setMode] = useState<Mode>('choice')
   const [skipSocialStep, setSkipSocialStep] = useState(false)
   const [skipAvatarStep, setSkipAvatarStep] = useState(false)
   const [completed, setCompleted] = useState(false)
@@ -16,27 +13,18 @@ function FullFlowDemo() {
 
   const resetDemo = () => {
     setCompleted(false)
-    setMode('choice')
   }
 
   return (
     <div className="demo">
       <h2>Full Flow Demo: Onboarding Component</h2>
       <p>
-        This demo shows the complete <code>&lt;Onboarding /&gt;</code> component with all modes.
+        This demo shows the complete <code>&lt;Onboarding /&gt;</code> component.
       </p>
 
       {!completed ? (
         <>
           <div className="controls">
-            <div className="control-group">
-              <label>Mode:</label>
-              <select value={mode} onChange={(e) => setMode(e.target.value as Mode)}>
-                <option value="choice">Choice (Download or Create)</option>
-                <option value="download-prompt">Download Prompt</option>
-              </select>
-            </div>
-
             <div className="control-group">
               <label>
                 <input
@@ -62,7 +50,6 @@ function FullFlowDemo() {
 
           <div className="onboarding-container">
             <Onboarding
-              mode={mode}
               skipSocialStep={skipSocialStep}
               skipAvatarStep={skipAvatarStep}
               onComplete={handleComplete}
@@ -82,8 +69,7 @@ function FullFlowDemo() {
       <div className="explanation">
         <h3>What This Tests:</h3>
         <ul>
-          <li><strong>Choice Mode:</strong> Let user pick download app or create web account (3-step wizard: name, socials, avatar)</li>
-          <li><strong>Download Prompt:</strong> Show iOS/Android download links only</li>
+          <li><strong>Account Creation:</strong> 3-step wizard: name, socials, avatar</li>
           <li><strong>Skip Options:</strong> Test optional social/avatar steps</li>
           <li><strong>DID Generation:</strong> Creates Ed25519 keypair and did:key identifier</li>
           <li><strong>LocalStorage:</strong> Persists profile and private key</li>
