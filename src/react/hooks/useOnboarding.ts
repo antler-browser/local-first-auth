@@ -5,7 +5,7 @@
 import { useState, useEffect } from 'react'
 import { getCurrentProfile } from '../../core/profile'
 import { hasProfile } from '../../core/storage'
-import { hasLocalFirstAuthAPI } from '../../core/api'
+import { hasLocalFirstAuthAPI, injectLocalFirstAuthAPI } from '../../core/api'
 import { isLocalFirstAuth } from '../../utils/deviceDetection'
 import type { Profile } from '../../types'
 
@@ -54,6 +54,12 @@ export function useOnboarding(): UseOnboardingReturn {
       if (!isMounted) return
 
       const isNative = isLocalFirstAuth()
+
+      // Restore API if profile exists in storage but API isn't injected (e.g. after browser refresh)
+      if (!isNative && hasProfile() && !hasLocalFirstAuthAPI()) {
+        injectLocalFirstAuthAPI()
+      }
+
       const hasWeb = hasProfile() && hasLocalFirstAuthAPI()
       const profile = getCurrentProfile()
 
