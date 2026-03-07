@@ -1,6 +1,6 @@
 {
   "name": "local-first-auth",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Easily add auth to your web app with this library. This library implements the Local First Auth specification client side, allowing you to skip building email-based auth systems.",
   "author": "Daniel Mathews <danny@antlerbrowser.com>",
   "license": "MIT",
