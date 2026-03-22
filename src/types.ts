@@ -161,6 +161,8 @@ export interface CustomStyles {
   fontFamily?: string
   buttonRadius?: string
   inputRadius?: string
+  inputTextColor?: string
+  inputBackgroundColor?: string
 
   // Mobile-specific styling options
   /**

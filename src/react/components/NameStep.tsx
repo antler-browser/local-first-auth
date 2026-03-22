@@ -18,6 +18,8 @@ export function NameStep({ onNext, onBack, currentStep, totalSteps, initialValue
     borderRadius = '12px',
     fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     inputRadius = '8px',
+    inputTextColor = '#333333',
+    inputBackgroundColor = '#ffffff',
     mobileButtonPressScale = 0.95,
     mobileTapHighlightColor = 'transparent',
     useSafeAreaInsets = true
@@ -106,6 +108,8 @@ export function NameStep({ onNext, onBack, currentStep, totalSteps, initialValue
       width: '100%',
       padding: '16px',
       fontSize: '16px',
+      color: inputTextColor,
+      backgroundColor: inputBackgroundColor,
       border: `2px solid ${error ? '#ff3b30' : 'rgba(0, 0, 0, 0.1)'}`,
       borderRadius: inputRadius,
       outline: 'none',

@@ -3,8 +3,9 @@ import { useState } from 'react'
 
 function CustomStyleDemo() {
   const [completed, setCompleted] = useState(false)
+  const [darkMode, setDarkMode] = useState(false)
 
-  const customStyles = {
+  const lightStyles = {
     primaryColor: '#764ba2',
     backgroundColor: '#f8f9fa',
     textColor: '#2d3748',
@@ -14,12 +15,32 @@ function CustomStyleDemo() {
     inputRadius: '8px',
   }
 
+  const darkStyles = {
+    primaryColor: '#b8964e',
+    backgroundColor: '#1a1a2e',
+    textColor: '#e0d5c1',
+    borderRadius: '16px',
+    fontFamily: 'Georgia, serif',
+    buttonRadius: '8px',
+    inputRadius: '8px',
+    inputTextColor: '#333333',
+    inputBackgroundColor: '#ffffff',
+  }
+
+  const customStyles = darkMode ? darkStyles : lightStyles
+
   return (
     <div className="demo">
       <h2>Custom Style Demo: Styling Props</h2>
       <p>
         Test the <code>customStyles</code> prop to theme the <code>&lt;Onboarding /&gt;</code> component.
       </p>
+
+      <div style={{ marginBottom: '16px' }}>
+        <button onClick={() => setDarkMode(!darkMode)} className="action-btn">
+          Switch to {darkMode ? 'Light' : 'Dark'} Mode
+        </button>
+      </div>
 
       {!completed ? (
         <div style={{ maxWidth: '500px', margin: '0 auto' }}>
@@ -43,7 +64,19 @@ function CustomStyleDemo() {
 
       <div className="code-example">
         <h3>Custom Styling Example:</h3>
-        <pre>{`const customStyles = {
+        <pre>{darkMode ? `// Dark mode
+const customStyles = {
+  primaryColor: '#b8964e',
+  backgroundColor: '#1a1a2e',
+  textColor: '#e0d5c1',
+  borderRadius: '16px',
+  fontFamily: 'Georgia, serif',
+  buttonRadius: '8px',
+  inputRadius: '8px',
+  inputTextColor: '#333333',
+  inputBackgroundColor: '#ffffff',
+}` : `// Light mode
+const customStyles = {
   primaryColor: '#764ba2',
   backgroundColor: '#f8f9fa',
   textColor: '#2d3748',
@@ -51,8 +84,9 @@ function CustomStyleDemo() {
   fontFamily: 'Georgia, serif',
   buttonRadius: '8px',
   inputRadius: '8px',
-}
+}`}
 
+{`
 <Onboarding
   customStyles={customStyles}
   onComplete={handleComplete}
@@ -75,7 +109,7 @@ function CustomStyleDemo() {
         <h3>Styling Tips:</h3>
         <ul>
           <li>Use <code>customStyles</code> prop to theme the entire component</li>
-          <li>Available style options: primaryColor, backgroundColor, textColor, borderRadius, fontFamily, buttonRadius, inputRadius</li>
+          <li>Available style options: primaryColor, backgroundColor, textColor, borderRadius, fontFamily, buttonRadius, inputRadius, inputTextColor, inputBackgroundColor</li>
           <li>Components use inline styles for theming, no CSS required</li>
           <li>All styles are optional - use defaults or customize what you need</li>
         </ul>
