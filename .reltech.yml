@@ -1,0 +1,34 @@
+# .reltech.yml
+version: 1
+
+project:
+  name: "Local First Auth"
+  description: "Simple client-side auth for web apps using decentralized identity (DID) — no servers, no passwords, no third-party auth providers"
+  builder: "Daniel Mathews"
+
+tags:
+  - local-first-auth
+  - client-side-auth
+  - authentication
+  - decentralized-identity
+  - privacy
+  - onboarding
+
+watch:
+  branches: ["main"]
+  signals: ["releases", "commits"]
+  threshold: "minor"
+
+preferences:
+  summarize_commits: true
+  summarize_readme: true
+  public_link: true
+  name_contributors: false
+  contact: "danny@taddy.org"
+
+interests:
+  - local-first-auth
+  - client-side-auth
+  - decentralized-identity
+  - authentxication
+  - onboarding
