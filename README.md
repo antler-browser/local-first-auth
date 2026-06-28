@@ -120,6 +120,39 @@ const onboarding = createOnboarding({
    - JPEG compression (~1MB max)
    - Browser-based processing (no server required)
 
+## Editing a Profile
+
+Once a profile exists, let users update their name, socials, or avatar with the
+`EditProfile` component. It's the symmetric counterpart to `Onboarding`: the same
+wizard, but pre-filled with the current profile and saved **in place**, so the user's
+DID and keypair (their identity) are preserved — no new account is created.
+
+```tsx
+import { EditProfile } from 'local-first-auth/react'
+
+function EditProfilePage() {
+  return (
+    <EditProfile
+      onComplete={(profile) => {
+        // Same did as before — identity is preserved
+        console.log('Profile updated:', profile)
+      }}
+    />
+  )
+}
+```
+
+Key behaviors:
+
+- **Pre-filled**: Seeds the name, socials, and avatar from the current profile
+  (via `getCurrentProfile()`).
+- **Stable identity**: Saves via `updateProfile()` under the hood, so the DID and
+  private key are unchanged across edits.
+- **No profile, no UI**: Renders nothing (`null`) if no profile exists yet — create
+  one with `Onboarding` first.
+- **Same options**: Supports the same `skipSocialStep`, `skipAvatarStep`, and
+  `customStyles` props as `Onboarding`.
+
 ## How It Works
 
 When a user creates an account:
@@ -147,15 +180,35 @@ interface OnboardingProps {
 }
 ```
 
+#### `<EditProfile />`
+Edits the current profile in place, preserving the user's DID and identity. Renders
+nothing if no profile exists.
+
+```tsx
+interface EditProfileProps {
+  skipSocialStep?: boolean
+  skipAvatarStep?: boolean
+  customStyles?: CustomStyles
+  onComplete?: (profile: Profile) => void
+  onBack?: () => void
+}
+```
+
 #### `<CreateAccountFlow />`
-The 3-step account creation flow.
+The 3-step account creation flow. Used internally by `<Onboarding />` (create) and
+`<EditProfile />` (edit).
 
 ```tsx
 interface CreateAccountFlowProps {
+  initialName?: string
   skipSocialStep?: boolean
   skipAvatarStep?: boolean
   onComplete?: (profile: Profile) => void
+  onBack?: () => void
   customStyles?: CustomStyles
+  mode?: 'create' | 'edit'        // 'edit' updates in place, keeping the DID
+  initialSocials?: SocialLink[]   // pre-fill socials (used by edit mode)
+  initialAvatar?: string | null   // pre-fill avatar (used by edit mode)
 }
 ```
 
@@ -262,6 +315,7 @@ npm run dev:example
 **What it tests:**
 - **Basic Demo**: `useOnboarding()` and `useProfile()` hooks, state detection, native API simulation
 - **Full Flow Demo**: Complete onboarding flow with account creation
+- **Edit Profile Demo**: Editing an existing profile in place with `<EditProfile />`, verifying the DID stays unchanged
 - **Core API Demo**: Vanilla JS testing of crypto, storage, profile, validation, and mock API injection
 - **Custom Style Demo**: Custom theming with `customStyles` prop
 

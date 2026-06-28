@@ -199,6 +199,30 @@ export interface CreateAccountFlowProps {
   onComplete?: (profile: Profile) => void
   onBack?: () => void
   customStyles?: CustomStyles
+
+  /**
+   * Flow mode. 'create' (default) mints a new DID via createProfile.
+   * 'edit' updates the current profile in place via updateProfile, keeping the DID.
+   */
+  mode?: 'create' | 'edit'
+
+  /**
+   * Pre-fill the socials step (used for editing, or resuming a draft).
+   */
+  initialSocials?: SocialLink[]
+
+  /**
+   * Pre-fill the avatar step.
+   */
+  initialAvatar?: string | null
+}
+
+export interface EditProfileProps {
+  skipSocialStep?: boolean
+  skipAvatarStep?: boolean
+  customStyles?: CustomStyles
+  onComplete?: (profile: Profile) => void
+  onBack?: () => void
 }
 
 export interface NameStepProps {

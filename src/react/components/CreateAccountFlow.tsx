@@ -8,7 +8,7 @@ import type { CreateAccountFlowProps, SocialLink } from '../../types'
 import { NameStep } from './NameStep'
 import { SocialsStep } from './SocialsStep'
 import { AvatarStep } from './AvatarStep'
-import { createProfile } from '../../core/profile'
+import { createProfile, updateProfile } from '../../core/profile'
 
 export function CreateAccountFlow({
   initialName,
@@ -16,27 +16,21 @@ export function CreateAccountFlow({
   skipAvatarStep = false,
   onComplete,
   onBack,
-  customStyles = {}
+  customStyles = {},
+  mode = 'create',
+  initialSocials = [],
+  initialAvatar = null
 }: CreateAccountFlowProps) {
-  // Check if we have a valid initial name (2-50 chars)
+  // Pre-fill the name if a valid one (2-50 chars) was provided
   const hasValidInitialName = !!(initialName && initialName.trim().length >= 2 && initialName.trim().length <= 50)
 
-  // Determine starting step based on whether name is pre-provided
-  const getInitialStep = (): 'name' | 'socials' | 'avatar' => {
-    if (!hasValidInitialName) return 'name'
-    if (!skipSocialStep) return 'socials'
-    if (!skipAvatarStep) return 'avatar'
-    return 'name' // fallback
-  }
-
-  const [step, setStep] = useState<'name' | 'socials' | 'avatar'>(getInitialStep())
+  const [step, setStep] = useState<'name' | 'socials' | 'avatar'>('name')
   const [name, setName] = useState(hasValidInitialName ? initialName!.trim() : '')
-  const [socials, setSocials] = useState<SocialLink[]>([])
-  const [isCreating, setIsCreating] = useState(false)
+  const [socials, setSocials] = useState<SocialLink[]>(initialSocials)
+  const [isSaving, setIsSaving] = useState(false)
 
   // Calculate total steps based on skip parameters
   const totalSteps = 3
-    - (hasValidInitialName ? 1 : 0) // skip name step if pre-provided
     - (skipSocialStep ? 1 : 0)
     - (skipAvatarStep ? 1 : 0)
 
@@ -74,22 +68,12 @@ export function CreateAccountFlow({
   }
 
   const handleSocialsBack = () => {
-    // If name was pre-provided, go back to the combined screen
-    if (hasValidInitialName && onBack) {
-      onBack()
-    } else {
-      setStep('name')
-    }
+    setStep('name')
   }
 
   const handleAvatarBack = () => {
     if (skipSocialStep) {
-      // If socials is skipped and name was pre-provided, go back to combined screen
-      if (hasValidInitialName && onBack) {
-        onBack()
-      } else {
-        setStep('name')
-      }
+      setStep('name')
     } else {
       setStep('socials')
     }
@@ -100,29 +84,37 @@ export function CreateAccountFlow({
     finalSocials: SocialLink[],
     avatar: string | null
   ) => {
-    setIsCreating(true)
+    setIsSaving(true)
 
     try {
-      // Create the profile
-      const profile = await createProfile(
-        finalName,
-        finalSocials.length > 0 ? finalSocials : undefined,
-        avatar
-      )
+      // Edit mode updates the current profile in place (keeps the DID);
+      // create mode mints a brand-new identity.
+      const profile =
+        mode === 'edit'
+          ? await updateProfile({
+              name: finalName,
+              socials: finalSocials.length > 0 ? finalSocials : undefined,
+              avatar
+            })
+          : await createProfile(
+              finalName,
+              finalSocials.length > 0 ? finalSocials : undefined,
+              avatar
+            )
 
       // Call onComplete callback if provided
       if (onComplete) {
         onComplete(profile)
       }
     } catch (error) {
-      console.error('Failed to create profile:', error)
-      alert('Failed to create profile. Please try again.')
+      console.error(`Failed to ${mode === 'edit' ? 'update' : 'create'} profile:`, error)
+      alert(`Failed to ${mode === 'edit' ? 'update' : 'create'} profile. Please try again.`)
     } finally {
-      setIsCreating(false)
+      setIsSaving(false)
     }
   }
 
-  if (isCreating) {
+  if (isSaving) {
     const {
       backgroundColor = '#ffffff',
       textColor = '#403B51',
@@ -148,7 +140,9 @@ export function CreateAccountFlow({
       >
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '48px', marginBottom: '24px' }}>⏳</div>
-          <div style={{ fontSize: '18px', opacity: 0.7 }}>Creating your profile...</div>
+          <div style={{ fontSize: '18px', opacity: 0.7 }}>
+            {mode === 'edit' ? 'Saving your changes...' : 'Creating your profile...'}
+          </div>
         </div>
       </div>
     )
@@ -174,7 +168,7 @@ export function CreateAccountFlow({
           name={name}
           onNext={handleSocialsNext}
           onBack={handleSocialsBack}
-          currentStep={hasValidInitialName ? 1 : 2}
+          currentStep={2}
           totalSteps={totalSteps}
           initialValue={socials}
           customStyles={customStyles}
@@ -183,8 +177,8 @@ export function CreateAccountFlow({
 
     case 'avatar':
       // Calculate current step for avatar
-      // Start from 1, add 1 if name step shown, add 1 if socials step shown
-      const avatarStep = 1 + (hasValidInitialName ? 0 : 1) + (skipSocialStep ? 0 : 1)
+      // Name is always step 1; add 1 if the socials step is shown
+      const avatarStep = 2 + (skipSocialStep ? 0 : 1)
       return (
         <AvatarStep
           name={name}
@@ -193,6 +187,7 @@ export function CreateAccountFlow({
           onBack={handleAvatarBack}
           currentStep={avatarStep}
           totalSteps={totalSteps}
+          initialValue={initialAvatar}
           customStyles={customStyles}
         />
       )

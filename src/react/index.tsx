@@ -7,6 +7,7 @@ export * from '../types'
 
 // Export React components
 export { Onboarding } from './components/Onboarding'
+export { EditProfile } from './components/EditProfile'
 export { CreateAccountFlow } from './components/CreateAccountFlow'
 export { NameStep } from './components/NameStep'
 export { SocialsStep } from './components/SocialsStep'

@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import BasicDemo from './demos/BasicDemo'
 import FullFlowDemo from './demos/FullFlowDemo'
+import EditProfileDemo from './demos/EditProfileDemo'
 import CoreApiDemo from './demos/CoreApiDemo'
 import CustomStyleDemo from './demos/CustomStyleDemo'
 
-type Tab = 'basic' | 'fullFlow' | 'coreApi' | 'customStyle'
+type Tab = 'basic' | 'fullFlow' | 'editProfile' | 'coreApi' | 'customStyle'
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('basic')
@@ -42,6 +43,12 @@ function App() {
           Full Flow
         </button>
         <button
+          className={activeTab === 'editProfile' ? 'tab active' : 'tab'}
+          onClick={() => setActiveTab('editProfile')}
+        >
+          Edit Profile
+        </button>
+        <button
           className={activeTab === 'coreApi' ? 'tab active' : 'tab'}
           onClick={() => setActiveTab('coreApi')}
         >
@@ -58,6 +65,7 @@ function App() {
       <main className="content">
         {activeTab === 'basic' && <BasicDemo />}
         {activeTab === 'fullFlow' && <FullFlowDemo />}
+        {activeTab === 'editProfile' && <EditProfileDemo />}
         {activeTab === 'coreApi' && <CoreApiDemo />}
         {activeTab === 'customStyle' && <CustomStyleDemo />}
       </main>
