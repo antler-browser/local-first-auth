@@ -49,6 +49,16 @@ export async function createProfile(
 }
 
 /**
+ * Create a new anonymous profile (DID + keypair) with no socials or avatar.
+ * Useful for apps that only need an identity, not profile details.
+ *
+ * @param name Optional display name. Defaults to 'anonymous'.
+ */
+export async function createAnonymousProfile(name = 'anonymous'): Promise<Profile> {
+  return createProfile(name)
+}
+
+/**
  * Get the current profile
  */
 export function getCurrentProfile(): Profile | null {

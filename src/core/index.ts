@@ -20,7 +20,7 @@ export {
 } from './storage'
 
 // Export profile management
-export { createProfile, getCurrentProfile, updateProfile } from './profile'
+export { createProfile, createAnonymousProfile, getCurrentProfile, updateProfile } from './profile'
 
 // Export API
 export { injectLocalFirstAuthAPI, removeLocalFirstAuthAPI, hasLocalFirstAuthAPI } from './api'

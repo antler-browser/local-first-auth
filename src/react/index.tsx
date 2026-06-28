@@ -21,6 +21,7 @@ export { useProfile } from './hooks/useProfile'
 // Re-export core utilities for convenience
 export {
   createProfile,
+  createAnonymousProfile,
   getCurrentProfile,
   updateProfile
 } from '../core/profile'

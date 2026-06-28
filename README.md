@@ -12,6 +12,8 @@ This library provides an easy way to add auth to your web app - no servers, no p
 
 Show the `Onboarding` component to let users pick a name (and optionally an avatar) — behind the scenes, the user gets a public and private key pair that is stored on their device. When your app needs to authenticate a request, call `getProfileDetails()` to get a signed JWT containing the user's profile. Pass the JWT with any request so your backend can verify the signature, confirm who made the request, and extract the profile data. 
 
+**Don't need any profile details?** Skip onboarding entirely with `createAnonymousProfile()` — it mints the same keypair-backed identity with no UI and no user input. Useful for apps that just need a public/private key to sign user activity.
+
 This is a great fit for apps where people are physically present together in the same place, such as:
 
 - Meetups
@@ -27,6 +29,7 @@ Drawbacks of using this library:
 
 - **Simple 3-step onboarding**: Name, socials, avatar
 - **Skip any screens you don't need**: You can skip the add socials and the avatar screens if your app doesn't need them.
+- **No onboarding required**: Mint an identity instantly with `createAnonymousProfile()` — no UI, no user input — for apps that only need a keypair.
 - **DID-based authentication**: Uses W3C Decentralized Identifiers (did:key)
 - **Local First Auth API compatible**: Generates profiles compatible with any Local First Auth app
 - **Zero configuration**: Works out-of-the-box with sensible defaults
@@ -80,6 +83,26 @@ const onboarding = createOnboarding({
   }
 })
 ```
+
+## Anonymous Accounts (No Onboarding)
+
+If your app only needs an identity — a DID + keypair to sign user activity — you can skip the
+onboarding UI completely. `createAnonymousProfile()` creates the account with no user input.
+
+```ts
+import { createAnonymousProfile } from 'local-first-auth'
+
+// name defaults to 'anonymous'; no socials, no avatar
+const profile = await createAnonymousProfile()
+
+// or pass a display name
+const guest = await createAnonymousProfile('Guest')
+```
+
+It does everything `createProfile` does — generates the Ed25519 keypair, persists the profile and
+private key to LocalStorage, and injects `window.localFirstAuth` — just without the wizard. The
+result is a normal `Profile`, fully compatible with the Local First Auth spec, so you can later
+let the user fill in details via `EditProfile` while keeping the same DID.
 
 ## Customization
 
@@ -249,6 +272,7 @@ const profile = useProfile()
 // Profile management
 import {
   createProfile,
+  createAnonymousProfile,
   getCurrentProfile,
   updateProfile,
   hasProfile,

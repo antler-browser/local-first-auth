@@ -8,6 +8,7 @@ import {
   savePrivateKey,
   clearProfile,
   createProfile,
+  createAnonymousProfile,
   injectLocalFirstAuthAPI,
   validateHandle,
   normalizeHandle,
@@ -105,6 +106,27 @@ function CoreApiDemo() {
       const avatar = await (window as any).localFirstAuth.getAvatar()
       log(`✓ API getAvatar(): ${avatar || 'null'}`)
     }
+  }
+
+  const testAnonymousProfile = async () => {
+    setOutput('')
+    log('=== Testing Anonymous Profile ===')
+
+    clearProfile()
+    log('✓ Cleared existing data')
+
+    const profile = await createAnonymousProfile()
+    log(`✓ Created anonymous profile (no input required)`)
+    log(`  Name: ${profile.name}`)
+    log(`  DID: ${profile.did}`)
+    log(`  Socials: ${profile.socials?.length || 0}`)
+    log(`  Avatar: ${profile.avatar ?? 'null'}`)
+
+    const hasAPI = (window as any).localFirstAuth !== undefined
+    log(`✓ Mock API injected: ${hasAPI}`)
+
+    const named = await createAnonymousProfile('Guest')
+    log(`✓ Created with custom name override: ${named.name}`)
   }
 
   const testValidation = () => {
@@ -207,6 +229,9 @@ function CoreApiDemo() {
         <button onClick={testProfile} className="action-btn">
           Test Profile Module
         </button>
+        <button onClick={testAnonymousProfile} className="action-btn">
+          Create Anonymous Account
+        </button>
         <button onClick={testValidation} className="action-btn">
           Test Social Validation
         </button>
@@ -242,6 +267,7 @@ function CoreApiDemo() {
           <li><strong>JWT:</strong> createJWT() - Sign payloads with EdDSA algorithm</li>
           <li><strong>Storage:</strong> saveProfile(), getProfile(), clearProfile() - LocalStorage operations</li>
           <li><strong>Profile:</strong> createProfile() - Complete profile creation flow with API injection</li>
+          <li><strong>Anonymous:</strong> createAnonymousProfile() - Mint a DID/keypair with no user input (name defaults to 'anonymous')</li>
           <li><strong>Validation:</strong> validateHandle() - Social handle validation for 23+ platforms</li>
           <li><strong>Social Links:</strong> createSocialLink() - Create platform-specific social links</li>
           <li><strong>Mock API:</strong> injectLocalFirstAuthAPI() - Inject window.localFirstAuth API</li>
