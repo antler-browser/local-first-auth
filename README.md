@@ -2,34 +2,30 @@
 
 This library provides an easy way to add auth to your web app - no servers, no passwords, no third-party auth providers.
 
-## Onboarding flow
-
-![local-first-auth-flow](https://github.com/user-attachments/assets/a04e6f08-1635-4522-97f0-9507c1ca718c)
-
-# In Between Static Websites and Traditional Auth Systems
-
-<img width="1200" height="600" alt="static-vs-trad-auth-2" src="https://github.com/user-attachments/assets/8f5abb22-3ba7-4752-a529-94ea02b6aaeb" />
-
-Show the `Onboarding` component to let users pick a name (and optionally an avatar) — behind the scenes, the user gets a public and private key pair that is stored on their device. When your app needs to authenticate a request, call `getProfileDetails()` to get a signed JWT containing the user's profile. Pass the JWT with any request so your backend can verify the signature, confirm who made the request, and extract the profile data. 
-
-**Don't need any profile details?** Skip onboarding entirely with `createAnonymousProfile()` — it mints the same keypair-backed identity with no UI and no user input. Useful for apps that just need a public/private key to sign user activity.
-
-This is a great fit for apps where people are physically present together in the same place, such as:
-
+A useful usecase of this library is to use it in a mini app where people are physically present together in the same place and they can authenticate by scanning a QR code. Such as:
 - Meetups
 - Social clubs
 - Local community events
 - Game nights with friends
+- TouchDesigner art installations
 - Any lightweight gathering where people are in the same place
 
-Drawbacks of using this library:
-- When a user clears their browsing data, their keys are lost and they'll need to create a new account. Therefore this library is best suited for apps where temporary or one-time accounts are useful. If you need a persistent account, a traditional email-based auth system is a better fit as your users can access their account from multiple devices and not have to create a new account if they clear their browsing data.
+## How it works
+
+Show the `<Onboarding />` component to create a profile for the user. This will show a popup to the user to collect their name, and optionally an avatar.
+
+![local-first-auth-flow](https://github.com/user-attachments/assets/a04e6f08-1635-4522-97f0-9507c1ca718c)
+
+After the user has created a profile, you get a public and private key pair that is stored on the user's device. When your app needs to authenticate a request, call `getProfileDetails()` to get a signed JWT containing the user's profile. Pass the JWT with any request so your backend can verify the signature, confirm who made the request, and get the profile data.
+
+**Don't need any user details?** Skip onboarding flow entirely with `createAnonymousProfile()` — you still get the same public and private key pair identity but no UI popup / user input is required. Useful for apps that just need identity and don't want any user details.
 
 ## Features
 
 - **Simple 3-step onboarding**: Name, socials, avatar
-- **Skip any screens you don't need**: You can skip the add socials and the avatar screens if your app doesn't need them.
-- **No onboarding required**: Mint an identity instantly with `createAnonymousProfile()` — no UI, no user input — for apps that only need a keypair.
+- **No onboarding required**: Create an identity instantly with `createAnonymousProfile()` — no UI, no user input — for apps that only need a keypair.
+- **Skip any screen you don't need**: You can skip the add socials and the avatar screens if your app doesn't need them.
+- **Edit user details** Use the `EditProfile` component to let users update their name, socials, or avatar after they have created an account.
 - **DID-based authentication**: Uses W3C Decentralized Identifiers (did:key)
 - **Local First Auth API compatible**: Generates profiles compatible with any Local First Auth app
 - **Zero configuration**: Works out-of-the-box with sensible defaults
@@ -365,15 +361,3 @@ import type {
   CustomStyles
 } from 'local-first-auth'
 ```
-
-## Long Term Storage of your keys
-
-This library was inspired by a recent trip to China. ie) One really innovative user experience in China is the idea that you don’t always need to download an app, sometimes the better experience is to just scan a QR code. Here is an example: When I enter a cafe, I don't have to download the cafe's app, I just scan a QR code and it allows me to pay for my coffee and track my loyalty points - no signup or app download required.
-
-This works because of WeChat's prominence in China. When I entered the cafe, I opened up WeChat and scanned the QR code. The cafe has built a WeChat mini app that uses my WeChat Id and WeChat Pay to authenticate me to allow me to pay for my coffee and track my loyalty points.
-
-It's cool and really convenient UX for users, BUT it would be cooler if we could build something like this but use open standards (so we don't need to have a super app like WeChat). This library uses the [Local First Auth specification](https://antlerbrowser.com/local-first-auth-specification) to make it easy to build in simple auth into your web app.
-
-However, [Antler](https://github.com/antler-browser/antler) is a demo app that showcases how any native mobile app can integrate this spec into their app. When you download Antler, you do the same onboarding process as you would with this library (enter your name and optionally an avatar). It generates a public and private key pair that is stored locally on your device. Whenever you scan a QR code using Antler, your profile details are shared with the web app. This means users don't have to go through account creation for every web app you use, and you don't have to worry about losing your keys if you clear your browsing data.
-
-My dream would be that if other messaging or event apps like Telegram, Signal, Meetup.com, etc. would build this spec into their app. It would give users the same great UX you get with WeChat but use open standards instead of requiring a super app like WeChat.
