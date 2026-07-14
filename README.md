@@ -2,7 +2,11 @@
 
 This library provides an easy way to add auth to your web app - no servers, no passwords, no third-party auth providers.
 
-A useful usecase of this library is to use it in a mini app where people are physically present together in the same place and they can authenticate by scanning a QR code. Such as:
+A practical use case: You can pass in your identity when you scan a QR code. If you pass in your identity, the website never asks you to log in or sign up, so you can start using it right away as a logged in user.
+
+This is highly inspired by how WeChat works in China. WeChat is a super app. When a user opens it up and scans a QR code, it passes in their WeChat identity so they can interact with the website instantly — no login, no signup. This might sound like a minor UX improvement, but innovation is that users in China don't have to download an app for everything, they just scan a QR code and get most of the practical benefits of a native app. **The idea behind this spec is simple: Can we deliver the same great UX as WeChat using an open standard instead of a super app?**.  
+
+Useful usecases of this library are where people are physically present together in the same place. Such as:
 - Meetups
 - Social clubs
 - Local community events
@@ -176,10 +180,10 @@ Key behaviors:
 
 When a user creates an account:
 
-1. **DID Generation**: Generates an Ed25519 keypair and did:key identifier
+1. **DID Generation**: Generates an Ed25519 keypair and did:key identifier — this is the profile's **root key**, which never signs JWTs directly
 2. **Profile Storage**: Saves profile data to LocalStorage
 3. **API Injection**: Injects `window.localFirstAuth` object
-4. **JWT Signing**: All API methods return signed JWTs (compatible with Local First Auth spec)
+4. **JWT Signing**: All API methods return signed JWTs (compatible with Local First Auth spec). Signing uses a **per-origin key** derived from the root key and the page's origin (HKDF-SHA256, as defined by the spec's Per-Origin Key Derivation section), so the JWT `iss` is the user's per-origin (pairwise) DID — stable for your site and portable across implementations holding the same root key, but different on every other site
 
 The generated profile is compatible with the Local First Auth specification. Your backend can verify JWTs the same way it would for a profile from any Local First Auth compatible app.
 

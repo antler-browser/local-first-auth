@@ -28,10 +28,13 @@
     "dev": "tsup --watch",
     "dev:example": "cd example && npm install && npm run dev",
     "type-check": "tsc --noEmit",
+    "test": "vitest run",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@stablelib/ed25519": "^1.0.3",
+    "@stablelib/hkdf": "^1.0.1",
+    "@stablelib/sha256": "^1.0.1",
     "base58-universal": "^2.0.0",
     "base64-js": "^1.5.1"
   },
@@ -41,7 +44,8 @@
     "@types/react": "^19.2.7",
     "react": "^19.2.1",
     "tsup": "^8.5.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0"

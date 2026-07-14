@@ -4,6 +4,8 @@
  */
 
 import * as ed25519 from '@stablelib/ed25519'
+import { HKDF } from '@stablelib/hkdf'
+import { SHA256 } from '@stablelib/sha256'
 import { encode as base58Encode } from 'base58-universal'
 import * as base64 from 'base64-js'
 import type { JWTHeader, JWTPayload, ProfileKeys } from '../types'
@@ -17,6 +19,12 @@ const ED25519_MULTICODEC_PREFIX = new Uint8Array([0xed, 0x01])
 
 // Key sizes
 const SEED_SIZE = 32 // Ed25519 seed size in bytes
+
+/**
+ * HKDF salt for per-origin key derivation, pinned by the Local First Auth spec.
+ * Changing it changes every per-origin DID.
+ */
+const ORIGIN_KEY_SALT = 'local-first-auth:origin-key:v1'
 
 /**
  * Helper function to encode to base64url (RFC 4648)
@@ -121,6 +129,85 @@ export async function generateProfileKeys(): Promise<ProfileKeys> {
     privateKey,
     publicKey: base64.fromByteArray(publicKey),
     did
+  }
+}
+
+/**
+ * Rebuild the full ProfileKeys from a base64-encoded 64-byte Ed25519 secret key.
+ *
+ * The keypair is regenerated from the seed (first 32 bytes), so the returned
+ * public key and DID are authoritative — a tampered trailing 32 bytes or a
+ * stale stored `did` can never switch the signing identity.
+ *
+ * Used for origin-scoped identities (stored profile has `scope`): the stored
+ * key is already the per-origin key and must sign directly, never be derived
+ * from again.
+ *
+ * @param privateKey - Base64-encoded 64-byte Ed25519 secret key
+ * @returns ProfileKeys: privateKey (base64), publicKey (base64), did
+ */
+export function deriveKeysFromPrivateKey(privateKey: string): ProfileKeys {
+  const keyBytes = base64.toByteArray(privateKey)
+
+  if (keyBytes.length !== 64) {
+    throw new Error('Invalid private key length. Expected 64 bytes.')
+  }
+
+  const seed = keyBytes.subarray(0, SEED_SIZE)
+  const keyPair = ed25519.generateKeyPairFromSeed(seed)
+
+  return {
+    privateKey: base64.fromByteArray(keyPair.secretKey),
+    publicKey: base64.fromByteArray(keyPair.publicKey),
+    did: createDidFromPublicKey(keyPair.publicKey)
+  }
+}
+
+/**
+ * Derive the per-origin (pairwise) keypair and DID for a website origin,
+ * as defined by the Local First Auth spec's Per-Origin Key Derivation section:
+ *
+ *   originSeed = HKDF-SHA256(ikm = rootSeed, salt = "local-first-auth:origin-key:v1",
+ *                            info = origin, length = 32)
+ *
+ * The derivation is deterministic, so any implementation holding the same root
+ * key computes the same DID for the same origin. The root key never signs
+ * mini-app payloads; JWTs are signed with the derived key.
+ *
+ * @param rootPrivateKey - Base64-encoded 64-byte Ed25519 root secret key
+ * @param origin - WHATWG origin (e.g. "https://example.com"). Subdomains,
+ *   schemes, and ports each derive a distinct DID. Opaque origins ("null")
+ *   are rejected.
+ * @returns ProfileKeys for the origin: privateKey (base64), publicKey (base64), did
+ */
+export async function deriveOriginKeys(rootPrivateKey: string, origin: string): Promise<ProfileKeys> {
+  const rootKeyBytes = base64.toByteArray(rootPrivateKey)
+
+  if (rootKeyBytes.length !== 64) {
+    throw new Error('Invalid private key length. Expected 64 bytes.')
+  }
+
+  if (!origin || origin === 'null') {
+    throw new Error('Cannot derive origin keys: origin is opaque or empty')
+  }
+
+  // Ed25519 secret key layout is seed (32 bytes) || public key (32 bytes)
+  const rootSeed = rootKeyBytes.subarray(0, SEED_SIZE)
+
+  const encoder = new TextEncoder()
+  const originSeed = new HKDF(
+    SHA256,
+    rootSeed,
+    encoder.encode(ORIGIN_KEY_SALT),
+    encoder.encode(origin)
+  ).expand(SEED_SIZE)
+
+  const keyPair = ed25519.generateKeyPairFromSeed(originSeed)
+
+  return {
+    privateKey: base64.fromByteArray(keyPair.secretKey),
+    publicKey: base64.fromByteArray(keyPair.publicKey),
+    did: createDidFromPublicKey(keyPair.publicKey)
   }
 }
 

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import {
   generateProfileKeys,
+  deriveOriginKeys,
   createJWT,
   saveProfile,
   getProfile,
@@ -32,21 +33,26 @@ function CoreApiDemo() {
     log('=== Testing Crypto Module ===')
 
     const keys = await generateProfileKeys()
-    log(`✓ Generated Ed25519 keypair`)
-    log(`  DID: ${keys.did}`)
+    log(`✓ Generated Ed25519 root keypair`)
+    log(`  Root DID: ${keys.did}`)
     log(`  Public key: ${keys.publicKey.substring(0, 20)}...`)
     log(`  Private key: ${keys.privateKey.substring(0, 20)}...`)
 
+    const derived = await deriveOriginKeys(keys.privateKey, window.location.origin)
+    log(`✓ Derived per-origin keypair for ${window.location.origin}`)
+    log(`  Per-origin DID: ${derived.did}`)
+    log(`  Differs from root DID: ${derived.did !== keys.did ? 'Yes' : 'No'}`)
+
     const payload = {
-      iss: keys.did,
+      iss: derived.did,
       aud: window.location.origin,
       iat: Math.floor(Date.now() / 1000),
       exp: Math.floor(Date.now() / 1000) + 120,
       type: 'test',
       data: { message: 'Test payload' }
     }
-    const jwt = await createJWT(payload, keys.privateKey)
-    log(`✓ Signed JWT with EdDSA`)
+    const jwt = await createJWT(payload, derived.privateKey)
+    log(`✓ Signed JWT with EdDSA using the per-origin key`)
     log(`  JWT: ${jwt.substring(0, 50)}...`)
     log(`  Parts: ${jwt.split('.').length} (header.payload.signature)`)
   }

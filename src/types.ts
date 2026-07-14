@@ -98,8 +98,8 @@ export interface JWTHeader {
 }
 
 export interface JWTPayload {
-  iss: string // Issuer - user's DID
-  aud: string // Audience - origin URL
+  iss: string // Issuer - user's per-origin (pairwise) DID, never the root DID
+  aud: string // Audience - WHATWG origin of the mini app (e.g. https://example.com)
   iat: number // Issued at timestamp
   exp: number // Expiration timestamp
   type: string // Operation type
@@ -115,6 +115,14 @@ export interface StoredProfile {
   name: string
   socials?: SocialLink[]
   avatar?: string | null
+  /**
+   * Present when this identity is origin-scoped: the stored private key is the
+   * per-origin derived key for exactly this WHATWG origin. Sign with it directly;
+   * never derive from it. Absent = root identity (derive per-origin at signing time).
+   * Written only by the import path (local-first-auth-import-export); createProfile()
+   * never sets it.
+   */
+  scope?: string
 }
 
 export interface StorageKeys {

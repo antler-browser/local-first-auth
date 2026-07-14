@@ -7,7 +7,7 @@
 export * from '../types'
 
 // Export crypto utilities
-export { generateProfileKeys, createJWT, decodeJWT, verifyJWT } from './crypto'
+export { generateProfileKeys, deriveOriginKeys, deriveKeysFromPrivateKey, createJWT, decodeJWT, verifyJWT } from './crypto'
 
 // Export storage utilities
 export {

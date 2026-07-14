@@ -1,8 +1,8 @@
 # Local First Auth Specification
 
-## Overview
-
 The Local First Auth Spec makes it easy to add auth to your website or mini app — no servers, no passwords, no third-party auth providers.
+
+A practical use case if you can pass in your identity when you scan a QR code (so the website doesn't need to ask you to login or signup) and you can immediately interact with the website. This is highly inspired by how WeChat works in China. WeChat is a super app. When a user open it up and scan a QR code, it passes in their identity (they can immediately interact with the website) This might seem like a simple UX improvement, but innovation is you dont have to download an app for everything, just scan a QR code. The idea for this spec is can we get the same experience of WeChat but by using an open standard instead of a super app.
 
 ## Developer Benefits
 
@@ -79,6 +79,60 @@ Local First Auth uses the `did:key` method, where the public key is the last par
 
 When you create a profile, your DID (which includes a public key) and a corresponding private key are generated and stored on your device. Whenever data is sent to a web app, the payload is signed using the DID's private key, ensuring that only the user who created the profile could have sent that data.
 
+When you create a profile on a Local First Auth app, your DID (which includes a public key) and a corresponding private key are generated and stored locally on your device. This is the profile's **root key**, and it never signs data shown to mini apps. Instead, each website gets its own DID, derived deterministically from the root key and the website's origin. The payload a mini app receives is signed with that per-origin key, ensuring it came from the DID owner — and because the derivation is deterministic, the same user always reappears as the same DID on the same site (including after moving devices via profile export/import), while different sites see unrelated DIDs and cannot correlate the user with each other.
+
+### Per-Origin Key Derivation
+
+Local First Auth apps MUST NOT sign mini-app payloads with the profile's root key. Instead, for each origin they MUST derive an Ed25519 keypair as:
+
+```
+originSeed = HKDF-SHA256(
+  ikm  = rootSeed,                                 // first 32 bytes of the 64-byte Ed25519 secret key
+  salt = UTF-8("local-first-auth:origin-key:v1"),
+  info = UTF-8(origin),
+  length = 32
+)
+```
+
+where `rootSeed` is the 32-byte Ed25519 seed of the profile's root key, and `origin` is the [WHATWG origin](https://url.spec.whatwg.org/#origin) of the URL that launched the WebView, serialized as `scheme://host[:port]` (lowercase, default ports omitted, no trailing slash). `originSeed` is used as an Ed25519 seed and the resulting public key is encoded as a `did:key` exactly as the root DID is.
+
+This construction is normative: two implementations holding the same root key MUST derive identical per-origin DIDs, so a user's identity on every site survives profile export/import between apps.
+
+Because the origin is the boundary, subdomains, schemes, and ports each scope a **distinct** DID: `https://app.acme.com`, `https://www.acme.com`, and `https://acme.com` are three different identities. Mini apps should publish one canonical origin in their QR codes — moving origins (e.g. `www` to apex) means returning users reappear with new DIDs.
+
+**Test vectors** — root private key (base64) `BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwfqSmxj4pxSCr71UHsTLsX5lUd2rr6+e5JCHuppFEbSLA==`, root DID `did:key:z6MkvDqGT54cXesYGvABpF1UapVNwjCqRcafi4Px6Thv5T3Z`:
+
+| Origin | Per-origin DID |
+| --- | --- |
+| `https://example.com` | `did:key:z6MksHmq5juqxMRUt6UYxnbCfprSmsEcaLd9riXhYZPB7hCF` |
+| `https://other.app` | `did:key:z6MkuPzxjqnHVeV3eupgRqjD9Me4EhAyKoohjU6PkkoBhLSt` |
+| `http://localhost:8787` | `did:key:z6MkoShWB63jPRQAMhWJD3J2Gq5BizC65JnRetMj5uj7EepD` |
+
+### Profile Export Format
+
+A profile can be exported as a JSON file, either to move a whole identity to another device/app or to hand a single site's identity to that site. Both use the same v1 envelope; the optional `scope` field distinguishes them:
+
+```json
+{
+  "type": "local-first-auth:export",
+  "version": 1,
+  "scope": "https://example.com",
+  "did": "did:key:z6Mk...",
+  "publicKey": "<base64 32-byte Ed25519 public key>",
+  "privateKey": "<base64 64-byte Ed25519 secret key>",
+  "name": "...",
+  "socials": [],
+  "avatar": "...",
+  "exportedAt": "..."
+}
+```
+
+- `did` and `publicKey` MUST re-derive from `privateKey` — a file that is not internally consistent MUST be rejected.
+- **No `scope`** — the file is a **root identity** (a full profile export for moving devices). Holders MUST derive per-origin keys from it as defined above and MUST NOT sign mini-app payloads with it directly.
+- **`scope` present** — the file is an **origin-scoped identity**: it carries the already-derived key for that one origin. The holder MUST use it only for that origin and sign with the key directly. Importing a scoped file as a full/root profile MUST be rejected — deriving per-origin keys from an already-derived key would create an identity unrelated to the user's.
+
+An origin-scoped export lets a user hand a website the exact key that website already knows them by, without ever exposing the root key.
+
 ## JavaScript API
 
 The `window.localFirstAuth` object is the primary interface for interacting with Local First Auth. It is available via both client-side libraries and native apps.
@@ -88,7 +142,7 @@ The `window.localFirstAuth` object is the primary interface for interacting with
 
 ### The `window.localFirstAuth` Object
 
-When Local First Auth is available a global `window.localFirstAuth` object is present. This allows you to 1) call methods and get back data and 2) check that the user has Local First Auth.
+When your mini app loads inside a Local First Auth app, a global `window.localFirstAuth` object is injected. This allows you to 1) call methods and get back data and 2) check that the user is using a Local First Auth app.
 
 ```tsx
 interface LocalFirstAuth {
@@ -292,8 +346,8 @@ Decoded data inside the JWT Payload.
 
 | Claim | Description |
 | --- | --- |
-| `iss` | Issuer - Public key of the user's DID. Use this when verifying the JWT. |
-| `aud` | Intended Audience - The mini app that requested the JWT.  |
+| `iss` | Issuer - The user's per-origin DID for this mini app. Use this when verifying the JWT. It is stable for your origin and portable across the user's devices, but different on every other site. |
+| `aud` | Intended Audience - The origin of the URL that launched the WebView (e.g. `https://yourdomain.com`). |
 | `iat` | Issued at timestamp |
 | `exp` | Expiration timestamp (default is 2 minutes) |
 | `type` | Local First Auth function or event type |
@@ -302,8 +356,9 @@ Decoded data inside the JWT Payload.
 ### Best Practices
 
 1. **Decoding & verifying the JWT** - Never trust unverified data. Decode JWTs using the `alg`. Verify that the JWT has been signed by the user's public key (`iss` field).
-2. **Validate audience -** Ensure the `aud` claim matches the domain of the mini app. This is set by the Local First Auth app based on the url that launched the WebView.
+2. **Validate audience -** Ensure the `aud` claim equals your origin. This is set by the Local First Auth app from the origin of the url that launched the WebView.
 3. **Validate expiration** - Reject expired tokens. Check the `exp` field.
+4. **`iss` is per-site** - Use `iss` as your durable per-user identifier for your site only. Do not expect it to match a DID seen by any other mini app — every origin sees a different DID for the same user.
 
 ## Making Authenticated Requests
 
@@ -370,8 +425,8 @@ app.post('/api/posts', async (req, res) => {
 
 See [code example](https://github.com/antler-browser/meetup-cloudflare/blob/main/shared/src/jwt.ts#L23) for `decodeAndVerifyJWT`. We decode & verify JWT signature including making sure the `aud` claim is for our mini app.
 
-**License for this specification**: [Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/)
+**License**: [Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/)
 
 **Author**: [Daniel Mathews](https://dmathewwws.com) (`danny@antlerbrowser.com`)
 
-**Last Modified**: 2026-02-21
+**Last Modified**: 2026-07-14

@@ -3,9 +3,9 @@
  * Implements the LocalFirstAuth interface from the Local First Auth Specification
  */
 
-import type { LocalFirstAuth, AppDetails, JWTPayload } from '../types'
+import type { LocalFirstAuth, AppDetails, JWTPayload, ProfileKeys } from '../types'
 import { getProfile, getPrivateKey } from './storage'
-import { createJWT } from './crypto'
+import { createJWT, deriveOriginKeys, deriveKeysFromPrivateKey } from './crypto'
 
 /**
  * Implementation of the Local First Auth API
@@ -14,7 +14,39 @@ import { createJWT } from './crypto'
 export class MockLocalFirstAuth implements LocalFirstAuth {
 
   /**
-   * Get profile details as a signed JWT
+   * Resolve the signing keys for the current page's origin.
+   *
+   * Root identity (no `scope` on the stored profile): the stored key never
+   * signs JWTs directly — derive the per-origin key for this origin.
+   *
+   * Origin-scoped identity (`scope` present, written by the import path): the
+   * stored key is already the per-origin key for exactly that origin. Sign
+   * with it directly — deriving from it again would produce a DID no other
+   * implementation ever computes. Refuse to sign on any other origin.
+   *
+   * Throws on opaque origins ("null", e.g. sandboxed iframes).
+   */
+  private async getOriginKeys(privateKey: string): Promise<{ origin: string; keys: ProfileKeys }> {
+    const origin = window.location.origin
+    const profile = getProfile()
+
+    if (profile?.scope) {
+      if (profile.scope !== origin) {
+        throw new Error(
+          `This profile is scoped to ${profile.scope} and cannot be used on ${origin}`
+        )
+      }
+      return { origin, keys: deriveKeysFromPrivateKey(privateKey) }
+    }
+
+    const keys = await deriveOriginKeys(privateKey, origin)
+    return { origin, keys }
+  }
+
+  /**
+   * Get profile details as a signed JWT.
+   * `iss` and `data.did` are the user's per-origin (pairwise) DID for this
+   * origin — not the profile's root DID — signed with the derived key.
    */
   async getProfileDetails(): Promise<string> {
     const profile = getProfile()
@@ -24,27 +56,31 @@ export class MockLocalFirstAuth implements LocalFirstAuth {
       throw new Error('No profile found. User must create a profile first.')
     }
 
+    const { origin, keys } = await this.getOriginKeys(privateKey)
+
     // Create JWT payload
     const now = Math.floor(Date.now() / 1000)
     const payload: JWTPayload = {
-      iss: profile.did,
-      aud: window.location.origin,
+      iss: keys.did,
+      aud: origin,
       iat: now,
       exp: now + 120, // 2 minutes expiration
       type: 'localFirstAuth:profile:details',
       data: {
-        did: profile.did,
+        did: keys.did,
         name: profile.name,
         socials: profile.socials || []
       }
     }
 
     // Sign and return JWT
-    return createJWT(payload, privateKey)
+    return createJWT(payload, keys.privateKey)
   }
 
   /**
-   * Get avatar as base64-encoded string in a signed JWT
+   * Get avatar as base64-encoded string in a signed JWT.
+   * `iss` and `data.did` are the user's per-origin (pairwise) DID for this
+   * origin — not the profile's root DID — signed with the derived key.
    */
   async getAvatar(): Promise<string | null> {
     const profile = getProfile()
@@ -59,22 +95,24 @@ export class MockLocalFirstAuth implements LocalFirstAuth {
       return null
     }
 
+    const { origin, keys } = await this.getOriginKeys(privateKey)
+
     // Create JWT payload
     const now = Math.floor(Date.now() / 1000)
     const payload: JWTPayload = {
-      iss: profile.did,
-      aud: window.location.origin,
+      iss: keys.did,
+      aud: origin,
       iat: now,
       exp: now + 120, // 2 minutes expiration
       type: 'localFirstAuth:avatar',
       data: {
-        did: profile.did,
+        did: keys.did,
         avatar: profile.avatar
       }
     }
 
     // Sign and return JWT
-    return createJWT(payload, privateKey)
+    return createJWT(payload, keys.privateKey)
   }
 
   /**
@@ -83,7 +121,7 @@ export class MockLocalFirstAuth implements LocalFirstAuth {
   getAppDetails(): AppDetails {
     return {
       name: 'Local First Auth',
-      version: '2.0.0',
+      version: '3.0.0',
       platform: 'browser',
       supportedPermissions: ['profile']
     }
